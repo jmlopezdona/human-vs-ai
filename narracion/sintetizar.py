@@ -60,11 +60,11 @@ POR_VOZ = {
     "es-419": {"guion": "es", "idioma": "es-419", "modelo": MODELO_BASE, "duration_factor": 1.0,
                "aviso": {"vector": {}, "semilla": 0},
                # 3-idea: «dos mil veinticinco»; 4-cap: «lee» sonaba a «li»; 5-idea: decía «Su cerebro»; 9-idea: «más
-               # honda»; 9-warn: «dar vuelta»; 10-idea: un chasquido antes de «unos»
-               "semillas": {"3-idea": 40, "4-cap": 10, "5-idea": 10, "9-idea": 10, "9-warn": 20, "10-idea": 30}},
+               # honda»; 9-warn: «dar vuelta»
+               "semillas": {"3-idea": 40, "4-cap": 10, "5-idea": 10, "9-idea": 10, "9-warn": 20}},
     "en": {"guion": "en", "idioma": "en-US", "modelo": MODELO_BASE, "duration_factor": 1.0,
            "aviso": {"vector": {}, "semilla": 0},
-           "semillas": {"10-idea": 10}},  # se comía «positions each»
+           "semillas": {}},
 }
 
 
