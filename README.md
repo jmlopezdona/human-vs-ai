@@ -9,6 +9,7 @@ Sitio 100 % estático (HTML, CSS y JavaScript), sin paso de compilación.
 ```
 .
 ├── index.html      La visualización completa (HTML, CSS y JS en un solo archivo)
+├── og-image.png    Imagen para compartir en redes (1200×630)
 ├── README.md
 └── .nojekyll       Evita que GitHub Pages procese el sitio con Jekyll
 ```
@@ -39,11 +40,13 @@ git init
 git add .
 git commit -m "Primera versión"
 git branch -M main
-git remote add origin https://github.com/<usuario>/human-vs-ai.git
+git remote add origin https://github.com/jmlopezdona/human-vs-ai.git
 git push -u origin main
 ```
 
-En GitHub: **Settings → Pages → Build and deployment → Deploy from a branch**, rama `main`, carpeta `/ (root)`. En uno o dos minutos estará en `https://<usuario>.github.io/human-vs-ai/`.
+En GitHub: **Settings → Pages → Build and deployment → Deploy from a branch**, rama `main`, carpeta `/ (root)`. En uno o dos minutos estará en `https://jmlopezdona.github.io/human-vs-ai/`.
+
+Las etiquetas para compartir (`og:url`, `og:image` y `twitter:image` en `index.html`) apuntan a `https://jmlopezdona.github.io/human-vs-ai/`. Si publicas el repositorio con otro nombre o en otra cuenta, actualízalas.
 
 ## Rigor
 

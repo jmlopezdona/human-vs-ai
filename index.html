@@ -8,7 +8,14 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Humano vs IA, contado en ceros">
 <meta property="og:description" content="Cada punto es un cero. Del vocabulario de una persona a todos los textos posibles: un viaje interactivo por las escalas de la IA.">
-<meta name="twitter:card" content="summary">
+<!-- Imagen para compartir: algunas redes (LinkedIn, X) exigen la URL absoluta -->
+<meta property="og:url" content="https://jmlopezdona.github.io/human-vs-ai/">
+<meta property="og:image" content="https://jmlopezdona.github.io/human-vs-ai/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Humano vs IA, contado en ceros: una cuadrícula de 80 bolas de colores, una por cero.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jmlopezdona.github.io/human-vs-ai/og-image.png">
 <meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111110" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -243,6 +250,7 @@ footer a{color:var(--tx-2)}
   .stage .zoom,.stage .intro-grid{grid-template-columns:minmax(0,1fr)}
   .stage .canvas-wrap,.stage .dotbox{width:min(100%,46vh);margin:0 auto}
   .stage .side{height:auto}
+  .stage #v-outro:not([hidden]){min-height:0}
   .stage .zoom .zeros-n{font-size:40px}
   .stage.is-fs .legend{display:none}
   .side .zeros .n{font-size:44px}
@@ -1025,6 +1033,9 @@ function lockHeights() {
   const parts = [$('title'), $('views'), $('caption')];
   const keep = {cur, sel, zoomSide, playing};
   parts.forEach(el => el.style.minHeight = '');
+  // En móvil todo va en una columna y la página se desplaza de todos modos:
+  // fijar la altura del paso más alto solo dejaría huecos en los demás.
+  if (matchMedia('(max-width:760px)').matches) { go(keep.cur, true); return; }
   measuring = true; playing = false;
   const max = parts.map(() => 0);
   STEPS.forEach((_, k) => {
