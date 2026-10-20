@@ -8,16 +8,19 @@ cada punto más multiplica la cifra por diez.
 
 ## Qué vas a ver
 
-Un viaje en diez pasos:
+Un viaje en doce pasos:
 
 1. **Cómo leer los puntos:** por qué contamos ceros en lugar de cifras.
-2. **Tres comparaciones cara a cara** entre una persona y un modelo de
-   lenguaje: palabras, conceptos y hardware. En las dos primeras va por
-   delante la IA; en conexiones físicas, el cerebro.
-3. **Cinco pasos alejando la cámara:** la edad del universo, los conceptos que
-   podría llegar a guardar una IA, los átomos del universo, las formas de
-   guardar una palabra y los textos que podría escribir, hasta el millón de
-   ceros.
+2. **Cuatro comparaciones cara a cara** entre una persona y un modelo de
+   lenguaje: palabras, conceptos, lo que se tiene en mente a la vez y
+   hardware. En las tres primeras va por delante la IA; en conexiones
+   físicas, el cerebro. Por el camino se compara cómo funcionan: la memoria
+   de trabajo frente al contexto, la atención y la actividad del cerebro.
+3. **Seis pasos alejando la cámara:** la edad del universo, los conceptos que
+   podría llegar a guardar una IA, los átomos del universo, los caminos que
+   puede seguir la información por sus capas (frente a los bucles del
+   cerebro), las formas de guardar una palabra y los textos que podría
+   escribir, hasta el millón de ceros.
 4. **Un resumen** con lo que nos llevamos.
 
 Cada paso tiene un apartado «Para entenderlo mejor», y al final de la página

@@ -28,7 +28,7 @@
   --tx:#141412;--tx-2:#55544e;--tx-3:#8a8981;
   --hu:#1D9E75;--hu-bg:#e3f4ec;--hu-tx:#0a5442;
   --ia:#7F77DD;--ia-bg:#ecebfd;--ia-tx:#3c3489;
-  --bb:#D9A021;--dir:#3B8BD4;--uni:#D85A30;--vec:#9C98B8;--rest:#b9b8b0;
+  --bb:#D9A021;--dir:#3B8BD4;--uni:#D85A30;--path:#C2489A;--vec:#9C98B8;--rest:#b9b8b0;
   --focus:#3B8BD4;
   --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --serif:"Fraunces",Georgia,"Times New Roman",serif;
@@ -40,14 +40,14 @@
   --tx:#f1f0ea;--tx-2:#c2c1b8;--tx-3:#8a8981;
   --hu:#34C08F;--hu-bg:#0d2f26;--hu-tx:#a6e9d0;
   --ia:#9890EC;--ia-bg:#24214a;--ia-tx:#d5d2fa;
-  --bb:#E7B43C;--dir:#5BA4E6;--uni:#EA7148;--vec:#6f6b8c;--rest:#4a4944;
+  --bb:#E7B43C;--dir:#5BA4E6;--uni:#EA7148;--path:#E070BB;--vec:#6f6b8c;--rest:#4a4944;
 }}
 :root[data-theme="dark"]{
   --bg:#111110;--surface:#1a1a18;--surface-2:#22221f;--line:rgba(255,255,255,.1);--line-strong:rgba(255,255,255,.22);
   --tx:#f1f0ea;--tx-2:#c2c1b8;--tx-3:#8a8981;
   --hu:#34C08F;--hu-bg:#0d2f26;--hu-tx:#a6e9d0;
   --ia:#9890EC;--ia-bg:#24214a;--ia-tx:#d5d2fa;
-  --bb:#E7B43C;--dir:#5BA4E6;--uni:#EA7148;--vec:#6f6b8c;--rest:#4a4944;
+  --bb:#E7B43C;--dir:#5BA4E6;--uni:#EA7148;--path:#E070BB;--vec:#6f6b8c;--rest:#4a4944;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -167,7 +167,7 @@ input[type=range]{width:100%;accent-color:var(--dir);margin:16px 0 4px}
 .take p{grid-column:1/-1;margin:6px 0 0;color:var(--tx-2);font-size:14px}
 .recap{margin-top:12px}
 .recap-h{font-size:13px;color:var(--tx-3);margin-bottom:8px}
-.recap-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.recap-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .recap-item{font:inherit;color:inherit;text-align:left;background:var(--surface-2);border:1px solid transparent;border-radius:12px;padding:8px 12px;cursor:pointer;min-width:0}
 .recap-item:hover{border-color:var(--line-strong)}
 .recap-item .rz{display:block;font-family:var(--serif);font-size:clamp(18px,2vw,24px);line-height:1.15;font-variant-numeric:tabular-nums lining-nums}
@@ -451,7 +451,7 @@ footer a{color:var(--tx-2)}
     <!-- Vista 3: conclusión -->
     <div class="view" id="v-outro" hidden>
       <div class="takeaways">
-        <div class="take"><i class="ti ti-scale" aria-hidden="true" style="color:var(--hu)"></i><h3 data-i18n="take1h">Escalas parecidas</h3><p data-i18n="take1p">Humano e IA se mueven entre 4 y 15 ceros. En vocabulario la IA va un cero por delante y en conceptos, al menos dos; en conexiones físicas, el cerebro le saca tres. Pero la IA avanza cada año y el humano, casi nada.</p></div>
+        <div class="take"><i class="ti ti-scale" aria-hidden="true" style="color:var(--hu)"></i><h3 data-i18n="take1h">Escalas parecidas</h3><p data-i18n="take1p">Humano e IA se mueven entre 1 y 15 ceros. La IA gana en palabras, en conceptos y, de largo, en lo que abarca de una vez; el cerebro le saca tres ceros en conexiones. Pero la IA avanza cada año y el humano, casi nada.</p></div>
         <div class="take"><i class="ti ti-infinity" aria-hidden="true" style="color:var(--uni)"></i><h3 data-i18n="take2h">Un espacio inmenso</h3><p data-i18n="take2p">El espacio en el que trabaja un LLM tiene decenas de miles de ceros: deja pequeño incluso al número de átomos del universo (80 ceros).</p></div>
         <div class="take"><i class="ti ti-school" aria-hidden="true" style="color:var(--ia)"></i><h3 data-i18n="take3h">Lo que cuenta es aprender</h3><p data-i18n="take3p">Casi todo ese espacio es ruido sin significado. Lo que el modelo aprovecha de verdad depende del entrenamiento, no del tamaño del espacio.</p></div>
       </div>
@@ -495,6 +495,7 @@ footer a{color:var(--tx-2)}
       <div class="card"><i class="ti ti-stack-2" aria-hidden="true"></i><h3 data-i18n="c3h">Capas apiladas</h3><p data-i18n="c3p">Las primeras resuelven sintaxis, las intermedias referencias y las últimas integran todo para la tarea. Cada capa suma su aportación al mismo flujo de vectores (<em>residual stream</em>).</p></div>
       <div class="card"><i class="ti ti-arrows-split-2" aria-hidden="true"></i><h3 data-i18n="c4h">Superposición</h3><p data-i18n="c4p">Cada concepto se guarda como una <strong>dirección</strong>: imagina una flecha que apunta hacia un lado concreto en ese espacio de miles de números. Si dos flechas son casi perpendiculares, sus conceptos apenas se mezclan. En alta dimensión caben muchísimas más flechas así que dimensiones hay, y el modelo lo aprovecha para guardar muchos más conceptos, a costa de algo de interferencia.</p></div>
       <div class="card"><i class="ti ti-cpu" aria-hidden="true"></i><h3 data-i18n="c5h">Dimensión y coste</h3><p data-i18n="c5p">Duplicar la dimensión multiplica por unos cuatro los parámetros de las capas principales. Lo que más pesa en la calidad es el total de parámetros, datos y cómputo de entrenamiento.</p></div>
+      <div class="card"><i class="ti ti-brain" aria-hidden="true"></i><h3 data-i18n="c6h">Falsos amigos</h3><p data-i18n="c6p">La «atención» de un LLM pesa a la vez todos los tokens anteriores; la tuya elige muy poco y descarta casi todo. Y las 6 capas de la corteza son estratos de tejido, no etapas en fila como las 96 de GPT-3. El cerebro está lleno de bucles; el transformer no tiene ninguno mientras procesa un token.</p></div>
     </div>
   </section>
 
@@ -520,6 +521,8 @@ footer a{color:var(--tx-2)}
       <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w4">Una sinapsis no equivale a un parámetro: una sinapsis es una pieza biológica con dinámica propia; un parámetro es un número.</span></li>
       <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w5">La capacidad de conceptos (direcciones casi independientes) depende mucho de la tolerancia elegida: cuánto se permite que dos conceptos se «mezclen».</span></li>
       <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w6">Que una lista de 12.288 números pueda tomar muchísimos valores no significa que todos sean útiles: casi todas esas combinaciones son ruido sin significado.</span></li>
+      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w7">Los tokens del contexto y los elementos de la memoria de trabajo no son la misma unidad: un elemento puede ser una idea entera. Y la persona tiene además una memoria a largo plazo enorme.</span></li>
+      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w8">El número de caminos depende de cómo se cuenten: aquí, por capas, cabezas de atención y bloques de neuronas, sin contar de qué token llega cada paso. Casi todos aportan muy poco.</span></li>
     </ul>
   </section>
 
@@ -536,12 +539,18 @@ footer a{color:var(--tx-2)}
       <li data-i18n="s14">Crecimiento del cómputo de entrenamiento (unas 5 veces al año desde 2020): Epoch AI, <a href="https://epoch.ai/trends">Trends in AI</a>.</li>
       <li data-i18n="s6">Neuronas: Azevedo et al. (2009). <a href="https://doi.org/10.1002/cne.21974">Equal numbers of neuronal and nonneuronal cells…</a> <em>J. Comp. Neurol.</em></li>
       <li data-i18n="s7">Sinapsis (10¹⁴–10¹⁵) y consumo (~20 W): <a href="https://en.wikipedia.org/wiki/Human_brain">Human brain</a>, Wikipedia, y referencias allí citadas.</li>
-      <li data-i18n="s8">Parámetros y dimensión 12.288: Brown et al. (2020). <a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a> (GPT-3).</li>
+      <li data-i18n="s8">Parámetros, dimensión 12.288, 96 capas y 96 cabezas de atención: Brown et al. (2020). <a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a> (GPT-3).</li>
       <li data-i18n="s9">Superposición: Elhage et al. (2022). <a href="https://transformer-circuits.pub/2022/toy_model/">Toy Models of Superposition</a>.</li>
       <li data-i18n="s10">Capacidad de conceptos (direcciones casi perpendiculares): <a href="https://en.wikipedia.org/wiki/Johnson%E2%80%93Lindenstrauss_lemma">lema de Johnson–Lindenstrauss</a>.</li>
       <li data-i18n="s11">Edad del universo (13.800 millones de años): <a href="https://en.wikipedia.org/wiki/Age_of_the_universe">Age of the universe</a>, Wikipedia.</li>
       <li data-i18n="s12">Átomos del universo observable (~10⁸⁰): <a href="https://en.wikipedia.org/wiki/Observable_universe">Observable universe</a>, Wikipedia.</li>
-      <li data-i18n="s13">Formas de guardar una palabra y textos posibles: cálculo propio (2<sup>16 × 12.288</sup> y 100.000<sup>200.000</sup>).</li>
+      <li data-i18n="s13">Formas de guardar una palabra, textos posibles y pesos de atención: cálculo propio (2<sup>16 × 12.288</sup>, 100.000<sup>200.000</sup> y 96 × 96 × 200.000<sup>2</sup> / 2).</li>
+      <li data-i18n="s16">Memoria de trabajo (~4 elementos): Cowan (2001). <a href="https://doi.org/10.1017/S0140525X01003922">The magical number 4 in short-term memory</a>. <em>Behavioral and Brain Sciences</em>.</li>
+      <li data-i18n="s17">Pensamiento a ~10 bits/s frente a ~10⁹ bits/s de los sentidos: Zheng y Meister (2024). <a href="https://doi.org/10.1016/j.neuron.2024.11.008">The unbearable slowness of being</a>. <em>Neuron</em>.</li>
+      <li data-i18n="s18">Neuronas activas a la vez (menos del 1 %): Lennie (2003). <a href="https://doi.org/10.1016/S0960-9822(03)00135-0">The cost of cortical computation</a>. <em>Current Biology</em>.</li>
+      <li data-i18n="s19">Reconocer un animal en ~150 ms: Thorpe, Fize y Marlot (1996). <a href="https://doi.org/10.1038/381520a0">Speed of processing in the human visual system</a>. <em>Nature</em>. Pocos pasos en serie: Feldman y Ballard (1982). <a href="https://doi.org/10.1207/s15516709cog0603_1">Connectionist models and their properties</a>. <em>Cognitive Science</em>.</li>
+      <li data-i18n="s20">Caminos dentro de la red: Veit, Wilber y Belongie (2016). <a href="https://arxiv.org/abs/1605.06431">Residual networks behave like ensembles of relatively shallow networks</a>; Elhage et al. (2021). <a href="https://transformer-circuits.pub/2021/framework/index.html">A Mathematical Framework for Transformer Circuits</a>. La cifra (194<sup>96</sup>) es cálculo propio con la forma de GPT-3 (fuente 10).</li>
+      <li data-i18n="s21">Pensar en voz alta: Wei et al. (2022). <a href="https://arxiv.org/abs/2201.11903">Chain-of-thought prompting elicits reasoning in large language models</a>.</li>
     </ol>
   </section>
 
@@ -562,6 +571,7 @@ const BANDS = [
   {to:18,      v:'--bb'},
   {to:30,      v:'--dir'},
   {to:80,      v:'--uni'},
+  {to:220,     v:'--path'},
   {to:59185,   v:'--vec'},
   {to:1000000, v:'--rest'}
 ];
@@ -570,16 +580,18 @@ const STEPS = [
   {type:'intro'},
   {type:'duel', hu:4, ia:5},
   {type:'duel', hu:5, ia:7},
+  {type:'duel', hu:1, ia:6},
   {type:'duel', hu:15, ia:12},
   {type:'zoom', n:18},
   {type:'zoom', n:30},
   {type:'zoom', n:80},
+  {type:'zoom', n:220},
   {type:'zoom', n:59185},
   {type:'zoom', n:1000000},
   {type:'outro'}
 ];
 const EXAMPLE_ICONS = ['ti-user','ti-hand-stop','ti-hourglass','ti-mood-smile','ti-book','ti-puzzle','ti-clock','ti-bulb','ti-users','ti-world'];
-const ROWS = [['hu',3],['hu',4],['ia',5],['hu',5],['ia',7],['hu',11],['uni',11],['ia',12],['hu',15],['uni',18],['teo',30],['uni',80],['teo',59185],['teo',1000000]];
+const ROWS = [['hu',1],['hu',3],['hu',4],['ia',5],['hu',5],['ia',6],['ia',7],['hu',11],['uni',11],['ia',12],['ia',14],['hu',15],['uni',18],['teo',30],['uni',80],['teo',220],['teo',59185],['teo',1000000]];
 
 /* ---------- Textos ---------- */
 const plural = (n, one, many) => n === 1 ? one : many;
@@ -609,25 +621,29 @@ const T = {
     inset: m => `Lupa ×${m}: los primeros 80 ceros`,
     vecLabel: 'formas de guardar una palabra (59.185 ceros)',
     byStretch: 'Ver todas a la vez',
-    zerosN: z => `${z} ceros`,
+    zerosN: z => `${z} ceros`, zeroOne: 'cero',
     barAria: n => `${n} ceros`,
-    bands: ['IA: parámetros de un LLM grande','Humano: sinapsis del cerebro','Segundos desde el Big Bang','Capacidad de conceptos de la IA','Átomos del universo observable','Formas de guardar una palabra','Textos posibles de 200.000 tokens'],
+    bands: ['IA: parámetros de un LLM grande','Humano: sinapsis del cerebro','Segundos desde el Big Bang','Capacidad de conceptos de la IA','Átomos del universo observable','Caminos de la información dentro de la IA','Formas de guardar una palabra','Textos posibles de 200.000 tokens'],
     words: ['uno','diez','cien','mil','diez mil','cien mil','un millón','diez millones','cien millones','mil millones'],
     examples: ['Tú: una persona','Los dedos de tus manos','Los años de un siglo','Caras que reconoces (~5.000)','Palabras que conoces (~40.000)','Tokens del vocabulario de un LLM (~100.000)','Segundos en once días y medio','Rasgos hallados dentro de un LLM (~10 millones)','Habitantes de México (~130 millones)','Habitantes de la India (~1.400 millones)'],
     groups: {hu:'Humano', ia:'IA', uni:'Universo', teo:'Teórico'},
     rows: [
+      ['Elementos en la memoria de trabajo','~4','Entre 3 y 5 «paquetes» de información que se sostienen a la vez mientras se piensa. Redondeado, un cero.'],
       ['Caras que reconoce una persona','~5.000'],
       ['Palabras que conoce un adulto','20.000–40.000'],
       ['Vocabulario de tokens de un LLM','~100.000'],
       ['Conceptos de una persona','~10⁵','Estimación generosa: unas 42.000 palabras, 5.000 caras y 30.000 categorías de objetos. Con 10⁶ ya se estira mucho.'],
+      ['Tokens que un LLM lee de una vez (contexto)','10⁵–10⁶','Entre 200.000 y un millón en los modelos de 2026.'],
       ['Rasgos internos hallados en un LLM','≥10⁷','Mínimo: 34 millones en Claude 3 Sonnet (2024) y 30 millones en Claude 3.5 Haiku (2025). Cuantos más se buscan, más aparecen.'],
       ['Neuronas del cerebro','~8,6 × 10¹⁰'],
       ['Estrellas de la Vía Láctea','1–4 × 10¹¹'],
       ['Parámetros de un LLM grande','10¹¹–10¹²'],
+      ['Pesos de atención al leer 200.000 tokens','~2 × 10¹⁴','Con la forma de GPT-3 (96 capas de 96 cabezas), cada token pesa todos los anteriores. Se vuelven a calcular en cada lectura.'],
       ['Sinapsis del cerebro','10¹⁴–10¹⁵'],
       ['Segundos desde el Big Bang','~4,4 × 10¹⁷'],
       ['Capacidad de conceptos de la IA (potencial)','10²⁰–10³⁰','Cuántos conceptos distintos cabrían en una lista de 12.288 números sin apenas mezclarse (en jerga, «direcciones casi independientes»).'],
       ['Átomos del universo observable','~10⁸⁰'],
+      ['Caminos de la información dentro de un LLM','~10²²⁰','En cada una de las 96 capas de GPT-3: una de sus 96 cabezas de atención o ninguna, y su bloque de neuronas o no (194⁹⁶). Contando además de qué token llega cada paso, saldrían muchos más.'],
       ['Formas distintas en que la IA puede guardar una palabra','~10⁵⁹·¹⁸⁵','Cuántas listas distintas de 12.288 números de 16 bits se podrían formar (en jerga, configuraciones de un «vector»).'],
       ['Textos posibles de 200.000 tokens','~10¹·⁰⁰⁰·⁰⁰⁰']
     ],
@@ -646,10 +662,15 @@ const T = {
        caption:'Aquí la IA va al menos dos ceros por delante: representa unas cien veces más conceptos, porque ha leído muchísimo más. Y la distancia crece: el cómputo con que se entrenan los modelos punteros se multiplica por cinco cada año, mientras que tu vocabulario, lo más fácil de medir de lo que sabes, crece solo unas 6.000 palabras entre los 20 y los 60 años.',
        idea:'Con técnicas de interpretabilidad (sparse autoencoders) se han encontrado hasta 34 millones de «rasgos» en Claude 3 Sonnet (2024) y 30 millones en Claude 3.5 Haiku (2025): direcciones que se activan con ideas concretas, como «el Golden Gate» o «código con errores». De los modelos de 2026 no se han publicado cifras.',
        warn:'La cifra humana es generosa y la de la IA es un mínimo: el número de rasgos lo fija el tamaño del diccionario que se entrena, y cuanto mayor es, más aparecen. Además, un rasgo no es exactamente un concepto humano, y no hay datos de cuántos conceptos gana una persona con la edad: solo de su vocabulario.'},
+      {phase:'Fase 1 · Cara a cara', title:'En mente a la vez',
+       hu:['Elementos que tienes en mente a la vez','~4'], ia:['Tokens que un LLM lee de una vez','10⁵–10⁶'],
+       caption:'Aquí la IA gana por goleada: tú tienes en mente unas 4 cosas a la vez; un LLM lee de una vez hasta un millón de tokens, varias novelas enteras, y puede consultar cualquiera de ellos. Cinco ceros de ventaja.',
+       idea:'Es la memoria de trabajo: lo que sostienes mientras piensas, como un número de teléfono que repites para no olvidarlo. Y tu pensamiento consciente avanza a unos 10 bits por segundo, mientras tus sentidos reciben unos mil millones: el cerebro descarta casi todo. La «atención» de la IA hace lo contrario: en cada capa, cada token mira a todos los anteriores.',
+       warn:'Un token no es un elemento de la memoria de trabajo: un elemento puede ser una idea entera, y redondear 4 a un cero ya es generoso. Además, tú tienes una memoria a largo plazo enorme; la IA solo recuerda lo que cabe en su contexto y lo que aprendió al entrenarse.'},
       {phase:'Fase 1 · Cara a cara', title:'El hardware',
        hu:['Sinapsis del cerebro','10¹⁴–10¹⁵'], ia:['Parámetros de un LLM grande','10¹¹–10¹²'],
        caption:'Aquí gana el humano: tus conexiones tienen tres ceros más (unas mil veces más) y funcionan con unos 20 vatios, lo que una bombilla.',
-       idea:'Tu cerebro tiene unos 86.000 millones de neuronas (11 ceros), casi tantas como estrellas en la Vía Láctea, y cada una se conecta con miles de otras.',
+       idea:'Tu cerebro tiene unos 86.000 millones de neuronas (11 ceros), casi tantas como estrellas en la Vía Láctea, y cada una se conecta con miles de otras. Pero menos del 1 % pueden estar muy activas a la vez: la energía no da para más. La IA no tiene conexiones fijas entre palabras: para leer 200.000 tokens, un modelo con la forma de GPT-3 calcula unos 2 × 10¹⁴ pesos de atención, tantos como tus sinapsis, y los vuelve a calcular en cada lectura.',
        warn:'Una sinapsis no equivale a un parámetro: es una pieza biológica con dinámica propia, no un simple número.'},
       {phase:'Fase 2 · Alejamiento', title:'Comparado con la edad del universo',
        label:'Segundos desde el Big Bang (~4 × 10¹⁷)',
@@ -666,6 +687,11 @@ const T = {
        caption:'Todos los átomos del universo observable: 80 ceros. Humano, IA, tiempo y capacidad de conceptos caben dentro: toca cada referencia en la leyenda para ver cuánto ocupa.',
        idea:'Se suele usar 10⁸⁰ como ejemplo del «número más grande con sentido físico». En el siguiente paso veremos que la IA lo supera de largo.',
        warn:'Es una estimación de orden de magnitud: según el método va de 10⁷⁸ a 10⁸².'},
+      {phase:'Fase 2 · Alejamiento', title:'¿Por cuántos caminos puede viajar la información dentro de la IA?',
+       label:'Caminos de la información por las 96 capas de un modelo como GPT-3 (~10²²⁰)',
+       caption:'Dentro de la IA, cada token sube por 96 capas. En cada una, la información puede pasar por una de sus 96 cabezas de atención o saltársela, y por su bloque de neuronas o saltárselo: 194 opciones por capa. Encadenadas, dan unos 10²²⁰ caminos, muchos más que átomos tiene el universo.',
+       idea:'Ninguna capa borra lo anterior: cada una suma su aportación al vector de la palabra, y por eso la información puede saltársela. Así, el modelo funciona como un enorme conjunto de caminos que se suman. Tu cerebro, en cambio, reconoce un animal en una foto en unos 150 ms, y como cada neurona tarda unos milisegundos en pasar el relevo, no le da para más de unas decenas de pasos seguidos: lo compensa trabajando a lo ancho, con cientos de millones de neuronas a la vez. Curiosamente, la IA tampoco va mucho más hondo: 96 capas por token.',
+       warn:'Casi todos esos caminos apenas aportan: el modelo usa unos pocos circuitos. Y en el cerebro, lleno de bucles, una señal puede dar vueltas sin fin, así que sus caminos ni siquiera se pueden contar. La IA no tiene bucles dentro de cada token; solo vuelve atrás al escribir, y por eso «pensar en voz alta» le ayuda.'},
       {phase:'Fase 2 · Alejamiento', title:'¿De cuántas formas puede la IA guardar una palabra?',
        label:'Combinaciones posibles de una lista de 12.288 números de 16 bits',
        caption:'Cada palabra es una lista de 12.288 números (un «vector»). Contando todas las listas posibles salen 59.185 ceros: humano, IA y universo quedan en una mancha de la esquina, que amplía la lupa.',
@@ -677,7 +703,7 @@ const T = {
        idea:'Con 100.000 tokens posibles en cada una de las 200.000 posiciones, hay 100.000²⁰⁰·⁰⁰⁰ = 10¹·⁰⁰⁰·⁰⁰⁰ textos distintos. Escrito entero, este número ocuparía cientos de páginas. La cifra crece con la longitud: cada token suma cinco ceros. Los modelos de 2026 leen hasta un millón de tokens de una vez (5 millones de ceros de textos posibles), pero lo que escriben en una respuesta tiene un tope de unos 128.000 tokens (unos 640.000 ceros).',
        warn:'La inmensa mayoría de esos textos son galimatías. El entrenamiento enseña al modelo a moverse solo por la diminuta región que tiene sentido.'},
       {phase:'Final', title:'Qué nos llevamos',
-       caption:'Humano e IA son comparables en escala. Lo que es verdaderamente inmenso es el espacio en el que trabaja el modelo, y lo que lo hace útil es el aprendizaje.',
+       caption:'Humano e IA son comparables en escala, aunque funcionan de formas casi opuestas. Lo que es verdaderamente inmenso es el espacio en el que trabaja el modelo, y lo que lo hace útil es el aprendizaje.',
        idea:'Un modelo más grande no es automáticamente mejor: lo que más pesa en la calidad es el total de parámetros, datos y cómputo de entrenamiento.',
        warn:'Todas las cifras son órdenes de magnitud aproximados. Revisa la tabla y las fuentes más abajo.'}
     ]
@@ -706,25 +732,29 @@ const T = {
     inset: m => `Magnifier ×${m}: the first 80 zeros`,
     vecLabel: 'ways to store one word (59,185 zeros)',
     byStretch: 'Show all at once',
-    zerosN: z => `${z} zeros`,
+    zerosN: z => `${z} zeros`, zeroOne: 'zero',
     barAria: n => `${n} zeros`,
-    bands: ['AI: parameters of a large LLM','Human: brain synapses','Seconds since the Big Bang','Concept capacity of the AI','Atoms in the observable universe','Ways to store one word','Possible texts of 200,000 tokens'],
+    bands: ['AI: parameters of a large LLM','Human: brain synapses','Seconds since the Big Bang','Concept capacity of the AI','Atoms in the observable universe','Paths for information inside the AI','Ways to store one word','Possible texts of 200,000 tokens'],
     words: ['one','ten','one hundred','one thousand','ten thousand','one hundred thousand','one million','ten million','one hundred million','one billion'],
     examples: ['You: one person','The fingers on your hands','The years in a century','Faces you recognize (~5,000)','Words you know (~40,000)','Tokens in an LLM vocabulary (~100,000)','Seconds in eleven and a half days','Features found inside an LLM (~10 million)','People living in Mexico (~130 million)','People living in India (~1.4 billion)'],
     groups: {hu:'Human', ia:'AI', uni:'Universe', teo:'Theoretical'},
     rows: [
+      ['Items in working memory','~4','Between 3 and 5 “chunks” of information held at once while thinking. Rounded, one zero.'],
       ['Faces a person recognizes','~5,000'],
       ['Words an adult knows','20,000–40,000'],
       ['Token vocabulary of an LLM','~100,000'],
       ['Concepts a person holds','~10⁵','A generous estimate: about 42,000 words, 5,000 faces and 30,000 object categories. 10⁶ is already a stretch.'],
+      ['Tokens an LLM reads at once (context)','10⁵–10⁶','Between 200,000 and a million in 2026 models.'],
       ['Internal features found in an LLM','≥10⁷','A lower bound: 34 million in Claude 3 Sonnet (2024) and 30 million in Claude 3.5 Haiku (2025). The harder you look, the more you find.'],
       ['Neurons in the brain','~8.6 × 10¹⁰'],
       ['Stars in the Milky Way','1–4 × 10¹¹'],
       ['Parameters of a large LLM','10¹¹–10¹²'],
+      ['Attention weights when reading 200,000 tokens','~2 × 10¹⁴','With the shape of GPT-3 (96 layers of 96 heads), every token weighs all the ones before it. They are computed again on every read.'],
       ['Synapses in the brain','10¹⁴–10¹⁵'],
       ['Seconds since the Big Bang','~4.4 × 10¹⁷'],
       ['Concept capacity of the AI (potential)','10²⁰–10³⁰','How many distinct concepts could fit in a list of 12,288 numbers with barely any overlap (in jargon, “nearly independent directions”).'],
       ['Atoms in the observable universe','~10⁸⁰'],
+      ['Paths for information inside an LLM','~10²²⁰','In each of GPT-3’s 96 layers: one of its 96 attention heads or none, and its block of neurons or not (194⁹⁶). Also counting which token each step comes from would give far more.'],
       ['Different ways an AI can store a word','~10⁵⁹ ¹⁸⁵','How many different lists of 12,288 16-bit numbers could be formed (in jargon, configurations of a “vector”).'],
       ['Possible texts of 200,000 tokens','~10¹ ⁰⁰⁰ ⁰⁰⁰']
     ],
@@ -743,10 +773,15 @@ const T = {
        caption:'Here the AI is at least two zeros ahead: it represents about a hundred times more concepts, because it has read vastly more. And the gap keeps growing: the compute used to train frontier models grows about fivefold every year, while your vocabulary, the easiest part of what you know to measure, grows by only about 6,000 words between the ages of 20 and 60.',
        idea:'Using interpretability techniques (sparse autoencoders), researchers have found up to 34 million “features” in Claude 3 Sonnet (2024) and 30 million in Claude 3.5 Haiku (2025): directions that light up for specific ideas, such as “the Golden Gate Bridge” or “buggy code”. No figures have been published for 2026 models.',
        warn:'The human figure is generous and the AI figure is a lower bound: the number of features is set by the size of the dictionary being trained, and the bigger it is, the more turn up. Also, a feature is not exactly a human concept, and there is no data on how many concepts a person gains with age, only on vocabulary.'},
+      {phase:'Phase 1 · Head to head', title:'Held in mind at once',
+       hu:['Items you hold in mind at once','~4'], ia:['Tokens an LLM reads at once','10⁵–10⁶'],
+       caption:'Here the AI wins by a landslide: you hold about 4 things in mind at once; an LLM reads up to a million tokens in one go, several whole novels, and can look back at any of them. Five zeros ahead.',
+       idea:'This is working memory: what you hold while you think, like a phone number you repeat so you do not forget it. And your conscious thought runs at about 10 bits per second, while your senses take in about a billion: the brain throws almost everything away. The AI’s “attention” does the opposite: in every layer, every token looks at all the ones before it.',
+       warn:'A token is not an item of working memory: an item can be a whole idea, and rounding 4 up to one zero is already generous. Besides, you have a huge long-term memory; the AI only remembers what fits in its context and what it learned in training.'},
       {phase:'Phase 1 · Head to head', title:'The hardware',
        hu:['Synapses in the brain','10¹⁴–10¹⁵'], ia:['Parameters of a large LLM','10¹¹–10¹²'],
        caption:'Here the human wins: your connections have three more zeros (about a thousand times more) and run on roughly 20 watts, like a light bulb.',
-       idea:'Your brain has about 86 billion neurons (11 zeros), almost as many as there are stars in the Milky Way, and each one connects to thousands of others.',
+       idea:'Your brain has about 86 billion neurons (11 zeros), almost as many as there are stars in the Milky Way, and each one connects to thousands of others. But fewer than 1% can be highly active at once: there is not enough energy for more. The AI has no fixed connections between words: to read 200,000 tokens, a model shaped like GPT-3 computes about 2 × 10¹⁴ attention weights, as many as your synapses, and computes them again on every read.',
        warn:'A synapse is not the same as a parameter: it is a biological component with its own dynamics, not just a number.'},
       {phase:'Phase 2 · Zooming out', title:'Compared with the age of the universe',
        label:'Seconds since the Big Bang (~4 × 10¹⁷)',
@@ -763,6 +798,11 @@ const T = {
        caption:'Every atom in the observable universe: 80 zeros. Human, AI, time and concept capacity all fit inside: tap each reference in the legend to see how much it takes up.',
        idea:'10⁸⁰ is often used as the example of “the largest number with physical meaning”. In the next step we will see the AI leave it far behind.',
        warn:'It is an order-of-magnitude estimate: depending on the method it ranges from 10⁷⁸ to 10⁸².'},
+      {phase:'Phase 2 · Zooming out', title:'How many paths can information take inside an AI?',
+       label:'Paths for information through the 96 layers of a model like GPT-3 (~10²²⁰)',
+       caption:'Inside the AI, each token rises through 96 layers. In each one, information can go through one of its 96 attention heads or skip it, and through its block of neurons or skip it: 194 options per layer. Chained together, that makes about 10²²⁰ paths, far more than there are atoms in the universe.',
+       idea:'No layer erases what came before: each one adds its contribution to the word’s vector, which is why information can skip it. So the model works like a huge collection of paths that add up. Your brain, by contrast, recognizes an animal in a photo in about 150 ms, and since each neuron takes a few milliseconds to pass the signal on, that leaves room for only a few dozen steps in a row: it makes up for it by working in breadth, with hundreds of millions of neurons at once. Curiously, the AI does not go much deeper either: 96 layers per token.',
+       warn:'Almost all of those paths contribute very little: the model relies on a few circuits. And in the brain, full of loops, a signal can go round and round without end, so its paths cannot even be counted. The AI has no loops within each token; it only goes back when it writes, which is why “thinking out loud” helps it.'},
       {phase:'Phase 2 · Zooming out', title:'In how many ways can an AI store a word?',
        label:'Possible combinations of a list of 12,288 16-bit numbers',
        caption:'Each word is a list of 12,288 numbers (a “vector”). Counting every possible list gives 59,185 zeros: human, AI and universe end up as a speck in the corner, enlarged by the magnifier.',
@@ -774,7 +814,7 @@ const T = {
        idea:'With 100,000 possible tokens in each of 200,000 positions, there are 100,000²⁰⁰ ⁰⁰⁰ = 10¹ ⁰⁰⁰ ⁰⁰⁰ different texts. Written out, this number would fill hundreds of pages. The figure grows with length: each token adds five zeros. 2026 models read up to a million tokens at once (5 million zeros of possible texts), but what they write in one reply is capped at about 128,000 tokens (about 640,000 zeros).',
        warn:'The vast majority of those texts are gibberish. Training teaches the model to move only through the tiny region that makes sense.'},
       {phase:'The end', title:'Key takeaways',
-       caption:'Humans and AI are comparable in scale. What is truly immense is the space the model works in, and what makes it useful is learning.',
+       caption:'Humans and AI are comparable in scale, even though they work in almost opposite ways. What is truly immense is the space the model works in, and what makes it useful is learning.',
        idea:'A bigger model is not automatically better: what matters most for quality is the total of parameters, data and training compute.',
        warn:'All figures are approximate orders of magnitude. Check the table and the sources below.'}
     ],
@@ -789,7 +829,7 @@ const T = {
       dragHint: 'Drag to add zeros', range0: '0 zeros', range9: '9 zeros',
       recapH: 'The journey in zeros · tap a figure to revisit that step',
       human: 'Human', ai: 'AI (language model)', zerosWord: 'zeros', zerosOnScreen: 'zeros on screen',
-      take1h: 'Similar scales', take1p: 'Humans and AI both sit between 4 and 15 zeros. In vocabulary the AI is one zero ahead and in concepts at least two; in physical connections, the brain is three ahead. But the AI moves forward every year, and the human barely at all.',
+      take1h: 'Similar scales', take1p: 'Humans and AI both sit between 1 and 15 zeros. The AI wins in words, in concepts and, by far, in what it takes in at once; the brain is three zeros ahead in connections. But the AI moves forward every year, and the human barely at all.',
       take2h: 'An immense space', take2p: 'The space an LLM works in has tens of thousands of zeros: it dwarfs even the number of atoms in the universe (80 zeros).',
       take3h: 'Learning is what counts', take3p: 'Almost all of that space is meaningless noise. What the model actually makes use of depends on training, not on the size of the space.',
       more: 'Dig deeper', idea: 'The idea', careful: 'Careful',
@@ -800,6 +840,7 @@ const T = {
       c2h: 'Attention', c2p: 'In each layer, every token can look at any earlier token, even hundreds of thousands of positions back. That is how the vector for “bank” changes depending on whether it is about a river or a loan.',
       c3h: 'Stacked layers', c3p: 'Early layers handle syntax, middle layers resolve references and the last ones bring everything together for the task. Each layer adds its contribution to the same stream of vectors (the <em>residual stream</em>).',
       c4h: 'Superposition', c4p: 'Each concept is stored as a <strong>direction</strong>: picture an arrow pointing a particular way in that space of thousands of numbers. If two arrows are nearly perpendicular, their concepts barely mix. In high dimensions there is room for far more such arrows than there are dimensions, and the model uses this to store many more concepts, at the cost of some interference.',
+      c6h: 'False friends', c6p: 'An LLM’s “attention” weighs all earlier tokens at once; yours picks very little and throws almost everything away. And the 6 layers of the cortex are strata of tissue, not stages in a row like GPT-3’s 96. The brain is full of loops; the transformer has none while it processes a token.',
       c5h: 'Dimension and cost', c5p: 'Doubling the dimension multiplies the parameters of the main layers by about four. What matters most for quality is the total of parameters, data and training compute.',
       tableH: 'Table of magnitudes', tableSub: 'Every figure from the journey in one place. The bar shows zeros on a 0 to 80 scale; striped bars go off the scale.',
       th1: 'What we count', th2: 'Group', th3: 'Order of magnitude', th4: 'Zeros', th5: 'Scale (0–80)',
@@ -811,6 +852,8 @@ const T = {
       w4: 'A synapse is not the same as a parameter: a synapse is a biological component with its own dynamics; a parameter is a number.',
       w5: 'The concept capacity (nearly independent directions) depends heavily on the chosen tolerance: how much two concepts are allowed to “mix”.',
       w6: 'The fact that a list of 12,288 numbers can take a huge number of values does not make them all useful: almost all of those combinations are meaningless noise.',
+      w7: 'Context tokens and working-memory items are not the same unit: an item can be a whole idea. And a person also has a huge long-term memory.',
+      w8: 'The number of paths depends on how you count them: here, by layers, attention heads and blocks of neurons, without counting which token each step comes from. Almost all of them contribute very little.',
       sourcesH: 'Sources', sourcesSub: 'References for each figure. Estimates without an established source are marked as such.',
       s1: 'Faces: Jenkins, Dowsett and Burton (2018). <a href="https://doi.org/10.1098/rspb.2018.1319">How many faces do people know?</a> <em>Proc. R. Soc. B</em>.',
       s2: 'Words: Brysbaert et al. (2016). <a href="https://doi.org/10.3389/fpsyg.2016.01116">How many words do we know?</a> <em>Frontiers in Psychology</em>.',
@@ -821,12 +864,18 @@ const T = {
       s14: 'Growth in training compute (about 5x per year since 2020): Epoch AI, <a href="https://epoch.ai/trends">Trends in AI</a>.',
       s6: 'Neurons: Azevedo et al. (2009). <a href="https://doi.org/10.1002/cne.21974">Equal numbers of neuronal and nonneuronal cells…</a> <em>J. Comp. Neurol.</em>',
       s7: 'Synapses (10¹⁴–10¹⁵) and power use (~20 W): <a href="https://en.wikipedia.org/wiki/Human_brain">Human brain</a>, Wikipedia, and references cited there.',
-      s8: 'Parameters and dimension 12,288: Brown et al. (2020). <a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a> (GPT-3).',
+      s8: 'Parameters, dimension 12,288, 96 layers and 96 attention heads: Brown et al. (2020). <a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a> (GPT-3).',
       s9: 'Superposition: Elhage et al. (2022). <a href="https://transformer-circuits.pub/2022/toy_model/">Toy Models of Superposition</a>.',
       s10: 'Concept capacity (nearly perpendicular directions): <a href="https://en.wikipedia.org/wiki/Johnson%E2%80%93Lindenstrauss_lemma">Johnson–Lindenstrauss lemma</a>.',
       s11: 'Age of the universe (13.8 billion years): <a href="https://en.wikipedia.org/wiki/Age_of_the_universe">Age of the universe</a>, Wikipedia.',
       s12: 'Atoms in the observable universe (~10⁸⁰): <a href="https://en.wikipedia.org/wiki/Observable_universe">Observable universe</a>, Wikipedia.',
-      s13: 'Ways to store a word and possible texts: our own calculation (2<sup>16 × 12,288</sup> and 100,000<sup>200,000</sup>).',
+      s13: 'Ways to store a word, possible texts and attention weights: our own calculation (2<sup>16 × 12,288</sup>, 100,000<sup>200,000</sup> and 96 × 96 × 200,000<sup>2</sup> / 2).',
+      s16: 'Working memory (~4 items): Cowan (2001). <a href="https://doi.org/10.1017/S0140525X01003922">The magical number 4 in short-term memory</a>. <em>Behavioral and Brain Sciences</em>.',
+      s17: 'Thought at ~10 bits/s versus ~10⁹ bits/s from the senses: Zheng and Meister (2024). <a href="https://doi.org/10.1016/j.neuron.2024.11.008">The unbearable slowness of being</a>. <em>Neuron</em>.',
+      s18: 'Neurons active at once (fewer than 1%): Lennie (2003). <a href="https://doi.org/10.1016/S0960-9822(03)00135-0">The cost of cortical computation</a>. <em>Current Biology</em>.',
+      s19: 'Recognizing an animal in ~150 ms: Thorpe, Fize and Marlot (1996). <a href="https://doi.org/10.1038/381520a0">Speed of processing in the human visual system</a>. <em>Nature</em>. Few serial steps: Feldman and Ballard (1982). <a href="https://doi.org/10.1207/s15516709cog0603_1">Connectionist models and their properties</a>. <em>Cognitive Science</em>.',
+      s20: 'Paths inside the network: Veit, Wilber and Belongie (2016). <a href="https://arxiv.org/abs/1605.06431">Residual networks behave like ensembles of relatively shallow networks</a>; Elhage et al. (2021). <a href="https://transformer-circuits.pub/2021/framework/index.html">A Mathematical Framework for Transformer Circuits</a>. The figure (194<sup>96</sup>) is our own calculation with the shape of GPT-3 (source 10).',
+      s21: 'Thinking out loud: Wei et al. (2022). <a href="https://arxiv.org/abs/2201.11903">Chain-of-thought prompting elicits reasoning in large language models</a>.',
       footer: '<span><i class="ti ti-heart" aria-hidden="true"></i> Made with love by a human and Claude (an AI)</span><span><a href="https://github.com/jmlopezdona/human-vs-ai">View on GitHub</a></span>'
     }
   }
@@ -961,6 +1010,8 @@ function drawDuel(cv, n, color, numEl, delay) {
 function renderDuel(st, tx) {
   const t = L(), [huWhat, huApprox] = tx.hu, [iaWhat, iaApprox] = tx.ia;
   $('hu-what').textContent = huWhat; $('ia-what').textContent = iaWhat;
+  // «1 cero», en singular (el resto de la interfaz dice «ceros»)
+  [['hu-n', st.hu], ['ia-n', st.ia]].forEach(([id, z]) => { $(id).nextElementSibling.textContent = z === 1 ? t.zeroOne : t.ui.zerosWord; });
   $('hu-approx').textContent = t.approx(huApprox, fmt(10 ** st.hu));
   $('ia-approx').textContent = t.approx(iaApprox, fmt(10 ** st.ia));
   const diff = Math.abs(st.hu - st.ia);
@@ -1127,6 +1178,9 @@ function pill(ctx, text, x, y, color, maxW = Infinity) {
     ctx.fillStyle = color; ctx.fillText(txt, x, ly);
   });
 }
+// La lupa solo hace falta cuando los primeros 80 ceros quedan diminutos: con
+// 220 todavía se ven bola a bola, y taparía los caminos de la IA
+const LENS_FROM = 1000;
 function renderZoom(st, tx) {
   const t = L(), n = st.n, colors = BANDS.map(b => cssVar(b.v));
   const items = BANDS.map((b, k) => k > 0 && BANDS[k - 1].to >= n ? '' :
@@ -1140,14 +1194,14 @@ function renderZoom(st, tx) {
   });
   syncLegend();
   const cv = $('zoom-cv');
-  cv.setAttribute('aria-label', `${tx.label}. ` + t.gridAria(fmt(n)) + (n > 80 ? t.ringAria : ''));
+  cv.setAttribute('aria-label', `${tx.label}. ` + t.gridAria(fmt(n)) + (n > LENS_FROM ? t.ringAria : ''));
   const {ctx, w} = fit(cv);
   // Lado entero: así la última fila/columna de puntos nunca queda cortada.
   const target = Math.ceil(Math.sqrt(n));
   if (!zoomCache || zoomCache.n !== n || zoomCache.theme !== themeKey()) zoomCache = {n, theme: themeKey(), img: buildImage(n, colors)};
   const img = zoomCache.img, from = Math.max(1, Math.min(zoomSide, target));
   const dur = reduced ? 0 : 900 + 450 * Math.log10(Math.max(1, target / from) * 10);
-  const t0 = performance.now(), num = $('zoom-n'), ring = n > 80;
+  const t0 = performance.now(), num = $('zoom-n'), ring = n > LENS_FROM;
   const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
   const frame = now => {
     const p = dur ? Math.min(1, (now - t0) / dur) : 1;
@@ -1245,9 +1299,9 @@ const beatsOf = k => { const tx = L().steps[k]; return [['cap', tx.caption], ['i
 // Duración en segundos de cada locución, por voz; la escribe narracion/igualar.py.
 // El texto en español es el mismo y lo dicen dos voces: de España y de Latinoamérica.
 const VOICE_S = {
-  'es-ES': {"1-cap":12.39,"1-idea":12.29,"1-warn":7.38,"2-cap":8.02,"2-idea":11.54,"2-warn":8.54,"3-cap":25.16,"3-idea":26.72,"3-warn":21.76,"4-cap":10.55,"4-idea":10.69,"4-warn":8.03,"5-cap":14.67,"5-idea":11.26,"5-warn":14.51,"6-cap":22.35,"6-idea":29.86,"6-warn":8.79,"7-cap":15.21,"7-idea":10.62,"7-warn":7.89,"8-cap":22.66,"8-idea":25.47,"8-warn":7.85,"9-cap":15.31,"9-idea":32.46,"9-warn":9.62,"10-cap":11.99,"10-idea":9.46,"10-warn":7.02},
-  'es-419': {"1-cap":15.98,"1-idea":14.69,"1-warn":9.27,"2-cap":8.61,"2-idea":14.65,"2-warn":10.99,"3-cap":30.03,"3-idea":31.66,"3-warn":25.95,"4-cap":13.24,"4-idea":12.74,"4-warn":8.44,"5-cap":17.9,"5-idea":13.1,"5-warn":17.06,"6-cap":27.01,"6-idea":35.02,"6-warn":10.52,"7-cap":18.12,"7-idea":13.62,"7-warn":8.22,"8-cap":26.95,"8-idea":29.63,"8-warn":9.62,"9-cap":16.9,"9-idea":40.23,"9-warn":11.95,"10-cap":12.98,"10-idea":11.3,"10-warn":7.83},
-  en: {"1-cap":15.82,"1-idea":15.57,"1-warn":8.75,"2-cap":8.68,"2-idea":15.37,"2-warn":10.21,"3-cap":26.37,"3-idea":26.24,"3-warn":24.88,"4-cap":12.8,"4-idea":11.9,"4-warn":10.08,"5-cap":16.23,"5-idea":12.46,"5-warn":15.54,"6-cap":24.55,"6-idea":34.24,"6-warn":10.98,"7-cap":18.23,"7-idea":11.13,"7-warn":10.61,"8-cap":23.05,"8-idea":26.52,"8-warn":8.16,"9-cap":17.34,"9-idea":40.29,"9-warn":9.59,"10-cap":11.71,"10-idea":10.58,"10-warn":7.19}
+  'es-ES': {"1-cap":12.39,"1-idea":12.29,"1-warn":7.38,"2-cap":8.02,"2-idea":11.54,"2-warn":8.54,"3-cap":25.16,"3-idea":26.23,"3-warn":21.76,"4-cap":16.43,"4-idea":23.6,"4-warn":18.92,"5-cap":10.55,"5-idea":31.7,"5-warn":8.03,"6-cap":14.67,"6-idea":11.26,"6-warn":14.51,"7-cap":22.35,"7-idea":29.86,"7-warn":8.79,"8-cap":15.21,"8-idea":10.62,"8-warn":7.89,"9-cap":28.49,"9-idea":36.98,"9-warn":22.65,"10-cap":22.66,"10-idea":25.47,"10-warn":7.85,"11-cap":15.31,"11-idea":32.46,"11-warn":9.62,"12-cap":14.66,"12-idea":9.46,"12-warn":7.02},
+  'es-419': {"1-cap":15.98,"1-idea":14.69,"1-warn":9.27,"2-cap":8.61,"2-idea":14.65,"2-warn":10.99,"3-cap":30.03,"3-idea":30.86,"3-warn":25.95,"4-cap":20.03,"4-idea":26.34,"4-warn":21.16,"5-cap":13.24,"5-idea":37.85,"5-warn":8.44,"6-cap":17.9,"6-idea":13.1,"6-warn":17.06,"7-cap":27.01,"7-idea":35.02,"7-warn":10.52,"8-cap":18.12,"8-idea":13.62,"8-warn":8.22,"9-cap":33.4,"9-idea":44.24,"9-warn":25.2,"10-cap":26.95,"10-idea":29.63,"10-warn":9.62,"11-cap":16.9,"11-idea":40.23,"11-warn":11.95,"12-cap":16.74,"12-idea":11.3,"12-warn":7.83},
+  en: {"1-cap":15.82,"1-idea":15.57,"1-warn":8.75,"2-cap":8.68,"2-idea":15.37,"2-warn":10.21,"3-cap":26.37,"3-idea":26.24,"3-warn":24.88,"4-cap":19.98,"4-idea":25.86,"4-warn":20.98,"5-cap":12.8,"5-idea":35.96,"5-warn":10.08,"6-cap":16.23,"6-idea":12.46,"6-warn":15.54,"7-cap":24.55,"7-idea":34.24,"7-warn":10.98,"8-cap":18.23,"8-idea":11.13,"8-warn":10.61,"9-cap":30.57,"9-idea":42.05,"9-warn":22.52,"10-cap":23.05,"10-idea":26.52,"10-warn":8.16,"11-cap":17.34,"11-idea":40.29,"11-warn":9.59,"12-cap":15.52,"12-idea":10.58,"12-warn":7.19}
 };
 const voiceDir = () => (lang === 'en' ? 'en' : voiceEs);
 const voiceKey = (k, kind) => `${k + 1}-${kind}`;

@@ -32,7 +32,7 @@ El script está dividido en secciones con comentarios `/* ---------- … -------
 
 | Sección | Qué hay |
 |---|---|
-| Datos numéricos | `BANDS` (alejamiento), `STEPS` (los 10 pasos: tipo y ceros de cada lado), `ROWS` (la tabla: grupo y ceros) |
+| Datos numéricos | `BANDS` (alejamiento), `STEPS` (los 12 pasos: tipo y ceros de cada lado), `ROWS` (la tabla: grupo y ceros) |
 | Textos | `T.es` y `T.en`: cada paso (`phase`, `title`, `caption`, `idea`, `warn`, `hu`, `ia`, `label`), filas de la tabla (`rows`), referencias (`bands`) y la interfaz (`ui`) |
 | Exponentes | `supify`: convierte ⁰¹²³⁴⁵⁶⁷⁸⁹ de los textos en `<sup>` |
 | Fase 1 y 2 | El cara a cara (`renderDuel`) y el alejamiento con zoom (`renderZoom`) |
@@ -48,7 +48,10 @@ Invariantes que no se ven a simple vista:
   interfaz se cambia en el HTML (español) y en `T.en.ui` (inglés).
 - **Los índices van alineados.** `T.*.steps[k]` corresponde a `STEPS[k]` y
   `T.*.rows[k]` a `ROWS[k]`. Para añadir o quitar un paso o una fila hay que
-  tocarlo en los tres sitios y en los dos idiomas.
+  tocarlo en los tres sitios y en los dos idiomas. Los audios y sus claves
+  van por número de paso: un paso en medio obliga a renombrar los `.mp3` de
+  los siguientes (con `git mv`, del último hacia atrás), las claves de
+  `VOICE_S`, `guion.json` y `semillas`, y las tomas `.wav` del PC.
 - **El modo vídeo tiene tres subtítulos por paso** (`cap`, `idea` y `warn`), y
   cada uno avanza cuando ha pasado su tiempo **y** ha terminado su locución.
   Con la voz puesta, su tiempo es la duración de `VOICE_S` más 900 ms; sin
@@ -90,7 +93,7 @@ idiomas:
    la citan.
 3. La fila de la tabla (`T.*.rows`) y las conclusiones del final (`take*` en el
    HTML y en `T.en.ui`).
-4. Las fuentes (`s1`…`s14` en el HTML y en `T.en.ui`) y las advertencias (`w*`).
+4. Las fuentes (`s1`…`s21` en el HTML y en `T.en.ui`) y las advertencias (`w*`).
 5. La frase hablada en `narracion/guion.json`, y su audio regenerado.
 
 Busca el valor antiguo con `grep` para no dejarte ninguno.

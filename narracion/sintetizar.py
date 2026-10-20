@@ -53,16 +53,18 @@ SILENCIO_DB = -40.0  # por debajo, respecto al pico, el aviso no suena: se recor
 POR_VOZ = {
     "es-ES": {"guion": "es", "idioma": "es-ES", "modelo": MODELO_AJUSTADO, "duration_factor": 1.0,
               "aviso": {"vector": {}, "semilla": 0},
-              # 3-cap: un «el» suelto antes de «Aquí»; 9-cap: partía el título en dos
-              # preguntas; 9-idea: «unos» sonaba a «uno»
-              "semillas": {"3-cap": 10, "9-cap": 70, "9-idea": 10}},
+              # 3-cap: un «el» suelto antes de «Aquí»; 3-idea: «dos mil veinticinco»; 5-idea: «GP. T3» y «pesos de
+              # tensión»; 9-idea: «reconoció» y «honda»; 11-cap: partía el título en dos
+              # preguntas; 11-idea: «unos» sonaba a «uno»; 12-cap: se comía el «Qué»
+              "semillas": {"3-cap": 10, "3-idea": 40, "5-idea": 10, "9-idea": 20, "11-cap": 70, "11-idea": 10, "12-cap": 20}},
     "es-419": {"guion": "es", "idioma": "es-419", "modelo": MODELO_BASE, "duration_factor": 1.0,
                "aviso": {"vector": {}, "semilla": 0},
-               # 4-idea: decía «Su cerebro»; 8-idea: un chasquido antes de «unos»
-               "semillas": {"4-idea": 10, "8-idea": 30}},
+               # 3-idea: «dos mil veinticinco»; 4-cap: «lee» sonaba a «li»; 5-idea: decía «Su cerebro»; 9-idea: «más
+               # honda»; 9-warn: «dar vuelta»; 10-idea: un chasquido antes de «unos»
+               "semillas": {"3-idea": 40, "4-cap": 10, "5-idea": 10, "9-idea": 10, "9-warn": 20, "10-idea": 30}},
     "en": {"guion": "en", "idioma": "en-US", "modelo": MODELO_BASE, "duration_factor": 1.0,
            "aviso": {"vector": {}, "semilla": 0},
-           "semillas": {"8-idea": 10}},  # se comía «positions each»
+           "semillas": {"10-idea": 10}},  # se comía «positions each»
 }
 
 
