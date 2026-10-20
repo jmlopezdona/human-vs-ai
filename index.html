@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Humano vs IA, contado en ceros</title>
+<meta name="description" content="Una visualización interactiva que compara, contando ceros, lo que maneja un ser humano, lo que maneja un modelo de lenguaje y el espacio teórico en el que trabaja.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Humano vs IA, contado en ceros">
+<meta property="og:description" content="Cada punto es un cero. Del vocabulario de una persona a todos los textos posibles: un viaje interactivo por las escalas de la IA.">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#f6f5f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111110" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#f6f5f0;--surface:#ffffff;--surface-2:#efeee7;--line:rgba(20,20,18,.12);--line-strong:rgba(20,20,18,.24);
+  --tx:#141412;--tx-2:#55544e;--tx-3:#8a8981;
+  --hu:#1D9E75;--hu-bg:#e3f4ec;--hu-tx:#0a5442;
+  --ia:#7F77DD;--ia-bg:#ecebfd;--ia-tx:#3c3489;
+  --bb:#D9A021;--dir:#3B8BD4;--uni:#D85A30;--vec:#9C98B8;--rest:#b9b8b0;
+  --focus:#3B8BD4;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --radius:16px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111110;--surface:#1a1a18;--surface-2:#22221f;--line:rgba(255,255,255,.1);--line-strong:rgba(255,255,255,.22);
+  --tx:#f1f0ea;--tx-2:#c2c1b8;--tx-3:#8a8981;
+  --hu:#34C08F;--hu-bg:#0d2f26;--hu-tx:#a6e9d0;
+  --ia:#9890EC;--ia-bg:#24214a;--ia-tx:#d5d2fa;
+  --bb:#E7B43C;--dir:#5BA4E6;--uni:#EA7148;--vec:#6f6b8c;--rest:#4a4944;
+}}
+:root[data-theme="dark"]{
+  --bg:#111110;--surface:#1a1a18;--surface-2:#22221f;--line:rgba(255,255,255,.1);--line-strong:rgba(255,255,255,.22);
+  --tx:#f1f0ea;--tx-2:#c2c1b8;--tx-3:#8a8981;
+  --hu:#34C08F;--hu-bg:#0d2f26;--hu-tx:#a6e9d0;
+  --ia:#9890EC;--ia-bg:#24214a;--ia-tx:#d5d2fa;
+  --bb:#E7B43C;--dir:#5BA4E6;--uni:#EA7148;--vec:#6f6b8c;--rest:#4a4944;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:14px 0;font-size:14px;color:var(--tx-2)}
+header.top nav{display:flex;gap:16px;align-items:center}
+header.top a{text-decoration:none}
+header.top a:hover{color:var(--tx)}
+.icon-btn{font:inherit;background:transparent;border:1px solid var(--line);color:var(--tx-2);border-radius:999px;width:34px;height:34px;display:inline-grid;place-items:center;cursor:pointer}
+.icon-btn:hover{color:var(--tx);border-color:var(--line-strong)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;gap:2px}
+.lang button{font:inherit;font-size:12px;font-weight:600;letter-spacing:.03em;background:transparent;border:0;color:var(--tx-3);padding:5px 9px;border-radius:999px;cursor:pointer;line-height:1}
+.lang button:hover{color:var(--tx)}
+.lang button[aria-pressed="true"]{background:var(--tx);color:var(--bg)}
+
+/* Hero */
+.hero{padding:40px 0 28px}
+.eyebrow{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx-3);font-weight:500}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,60px);line-height:1.04;letter-spacing:-.02em;margin:10px 0 16px}
+h1 .hu{color:var(--hu)} h1 .ia{color:var(--ia)}
+.lede{font-size:clamp(17px,2.2vw,20px);color:var(--tx-2);max-width:640px;margin:0}
+
+/* Stage */
+/* La presentación usa el mismo ancho que a pantalla completa (sobresale de la columna de texto) */
+html{overflow-x:clip}
+.stage{width:min(1240px,calc(100vw - 32px));margin:8px 0 0 calc(50% - min(620px,50vw - 16px));background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px 22px;margin-bottom:48px;box-shadow:0 1px 0 rgba(0,0,0,.02),0 20px 50px -30px rgba(0,0,0,.25)}
+.progress{display:flex;gap:4px;margin-bottom:12px}
+.progress button{flex:1;height:6px;border:none;border-radius:99px;background:var(--surface-2);cursor:pointer;padding:0;position:relative;overflow:hidden}
+.progress button.done{background:var(--line-strong)}
+.progress button.on{background:var(--tx)}
+.progress button:hover{background:var(--tx-3)}
+/* Cuenta atrás del modo automático: el paso actual se va rellenando */
+.progress button.timing{background:var(--line-strong)}
+.progress button.timing::after{content:"";position:absolute;inset:0;background:var(--tx);transform-origin:left;animation:fill var(--dur,5s) linear forwards}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* Pantalla completa (modo vídeo). .fs es el respaldo cuando el navegador no
+   permite pantalla completa en elementos, como Safari en iPhone. */
+.stage.fs{position:fixed;inset:0;z-index:100;margin:0;border-radius:0;border:none}
+.stage.is-fs{width:auto;margin:0;background:var(--bg);display:flex;flex-direction:column;justify-content:safe center;overflow:auto;padding:clamp(16px,3vh,40px) clamp(16px,5vw,72px);box-shadow:none}
+.stage.is-fs > *{width:100%;max-width:1240px;margin-left:auto;margin-right:auto;flex-shrink:0}
+.stage.is-fs .kbd-hint,.stage.is-fs #more-btn,.stage.is-fs .more-body{display:none}
+/* Disposición compacta, igual en la página y a pantalla completa: la
+   presentación cabe entera en la pantalla sin tener que desplazarse. */
+.stage .zoom .zeros-n{font-size:clamp(32px,5vh,56px)}
+.stage .zoom,.stage .intro-grid{grid-template-columns:auto minmax(0,1fr)}
+/* --box: lado de la caja de bolas; los paneles del cara a cara miden lo mismo de alto */
+.stage{--box:min(45vh,48vw)}
+.stage .canvas-wrap,.stage .dotbox{width:var(--box)}
+.stage .side{height:var(--box)}
+/* Paso final: mismo alto que la caja; conclusiones arriba y resumen abajo */
+.stage #v-outro:not([hidden]){display:flex;flex-direction:column;justify-content:space-between;min-height:var(--box)}
+.stage .side canvas{margin-left:auto;margin-right:auto}
+#fs-exit{display:none}
+.stage.is-fs #fs-exit{display:inline-flex}
+.step-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px}
+.phase{font-size:13px;color:var(--tx-3);font-weight:500;display:flex;align-items:center;gap:8px}
+.phase .count{font-variant-numeric:tabular-nums}
+.step-title{font-family:var(--serif);font-weight:600;font-size:clamp(22px,min(3.4vw,5.4vh),42px);line-height:1.15;margin:4px 0 0;letter-spacing:-.01em}
+.view[hidden]{display:none!important}
+
+/* Intro */
+.intro-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+.big-number{font-family:var(--serif);font-size:clamp(34px,5.6vw,58px);line-height:1;font-variant-numeric:tabular-nums lining-nums;word-break:break-all;letter-spacing:-.01em}
+.big-number .z{color:var(--dir)}
+.big-word{font-size:18px;color:var(--tx-2);margin:8px 0 14px}
+.example{display:flex;gap:10px;align-items:center;background:var(--surface-2);border-radius:12px;padding:10px 12px;font-size:15px;color:var(--tx-2);min-height:52px}
+.example i{font-size:22px;color:var(--tx)}
+input[type=range]{width:100%;accent-color:var(--dir);margin:16px 0 4px}
+.range-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--tx-3)}
+.dotbox{background:var(--surface-2);border-radius:var(--radius);padding:10px;aspect-ratio:1/1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)}
+.dotbox .d{width:76%;aspect-ratio:1/1;place-self:center;border-radius:50%;background:var(--dir);animation:pop .35s cubic-bezier(.3,1.6,.5,1) both}
+.dotbox .hint{grid-column:1/-1;grid-row:1/-1;place-self:center;text-align:center;font-size:14px;color:var(--tx-3);padding:0 16px}
+
+/* Duel */
+.duel{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:stretch}
+.side{position:relative;border-radius:var(--radius);padding:16px;min-width:0;display:flex;flex-direction:column}
+.side.hu{background:var(--hu-bg);color:var(--hu-tx)}
+.side.ia{background:var(--ia-bg);color:var(--ia-tx)}
+.side .who{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px}
+.side .who i{font-size:20px}
+.side .what{font-size:14px;opacity:.85;min-height:42px;margin-top:4px}
+.side .zeros{display:flex;align-items:baseline;gap:8px;margin:6px 0 2px}
+.side .zeros .n{font-family:var(--serif);font-size:52px;line-height:1;font-variant-numeric:tabular-nums lining-nums}
+.side .zeros span{font-size:14px;opacity:.8}
+.side .approx{font-family:var(--mono);font-size:13px;opacity:.85;margin-bottom:10px;word-break:break-all}
+.side canvas{width:100%;display:block;margin-top:auto}
+.vs{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:110px;text-align:center}
+.vs .badge{font-family:var(--serif);font-size:26px;font-weight:600;background:var(--surface-2);border-radius:14px;padding:8px 12px;line-height:1.1}
+.vs small{font-size:12px;color:var(--tx-3);max-width:120px;line-height:1.35}
+
+/* Zoom */
+.zoom{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+.canvas-wrap{position:relative;background:var(--surface-2);border-radius:var(--radius);padding:10px;aspect-ratio:1/1}
+.canvas-wrap canvas{width:100%;height:100%;display:block;max-width:100%}
+.side canvas,.zoom > *,.duel > *{min-width:0}
+.zoom .zeros-n{font-family:var(--serif);font-size:clamp(44px,6vw,64px);line-height:1;font-variant-numeric:tabular-nums lining-nums;margin:6px 0 2px}
+.zoom .zeros-u{font-size:14px;color:var(--tx-3);margin-bottom:14px}
+.legend{display:flex;flex-direction:column;gap:0;font-size:13px;color:var(--tx-2);margin:0 0 14px;padding:0;list-style:none}
+.legend button{font:inherit;color:inherit;width:100%;display:flex;align-items:center;gap:8px;text-align:left;background:transparent;border:1px solid transparent;border-radius:8px;padding:2px 8px;cursor:pointer}
+.legend button:hover{background:var(--surface-2)}
+.legend button[aria-pressed="true"]{background:var(--surface-2);border-color:var(--line-strong);color:var(--tx);font-weight:600}
+.legend .sw{width:12px;height:12px;border-radius:3px;flex:none}
+.legend .sw.all{border-radius:50%;background:radial-gradient(circle,var(--ia) 0 28%,var(--hu) 28% 46%,var(--bb) 46% 62%,var(--dir) 62% 80%,var(--uni) 80%)}
+.legend .rng{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--tx-3);font-weight:400}
+
+/* Outro */
+.takeaways{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+/* Paso final compacto: no debe ser más alto que los demás (marca la altura fija) */
+.take{background:var(--surface-2);border-radius:var(--radius);padding:14px 16px;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;align-items:center}
+.take i{font-size:22px}
+.take h3{font-size:16px;margin:0}
+.take p{grid-column:1/-1;margin:6px 0 0;color:var(--tx-2);font-size:14px}
+.recap{margin-top:12px}
+.recap-h{font-size:13px;color:var(--tx-3);margin-bottom:8px}
+.recap-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.recap-item{font:inherit;color:inherit;text-align:left;background:var(--surface-2);border:1px solid transparent;border-radius:12px;padding:8px 12px;cursor:pointer;min-width:0}
+.recap-item:hover{border-color:var(--line-strong)}
+.recap-item .rz{display:block;font-family:var(--serif);font-size:clamp(18px,2vw,24px);line-height:1.15;font-variant-numeric:tabular-nums lining-nums}
+.recap-item .rz .hu{color:var(--hu)} .recap-item .rz .ia{color:var(--ia)} .recap-item .rz .sep{color:var(--tx-3)}
+.recap-item .rl{display:block;font-size:13px;color:var(--tx-2);margin-top:2px}
+
+/* Caption + controls */
+.caption{font-size:clamp(14px,min(1.45vw,2.5vh),20px);line-height:1.55;margin:12px 0 0;max-width:1240px}
+.more-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.more-body[hidden]{display:none}
+#more-btn[aria-expanded="true"]{background:var(--surface-2);border-color:var(--tx-3)}
+.more-body .box{font-size:14px;color:var(--tx-2);background:var(--surface-2);border-radius:12px;padding:12px 14px}
+.more-body .box b{display:flex;align-items:center;gap:6px;color:var(--tx);font-size:13px;margin-bottom:4px}
+.controls{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.btn{font:inherit;font-size:15px;font-weight:500;color:var(--tx);background:transparent;border:1px solid var(--line-strong);border-radius:12px;padding:10px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.btn.primary:hover{opacity:.88;background:var(--tx)}
+.btn.cta{font-size:17px;font-weight:600;padding:14px 22px;border-radius:14px;margin-top:24px;box-shadow:0 10px 30px -12px rgba(0,0,0,.45)}
+.btn.cta i{font-size:20px}
+.lbl-short{display:none}
+sup{font-size:.62em;line-height:0;vertical-align:.5em;font-variant-numeric:lining-nums}
+.beat-tag{display:inline-flex;align-items:center;gap:6px;font-size:.78em;font-weight:600;padding:2px 10px;border-radius:99px;background:var(--surface-2);margin-right:10px;vertical-align:.12em}
+.beat-tag.idea{color:var(--bb)} .beat-tag.warn{color:var(--uni)}
+.btn:disabled{opacity:.4;cursor:default}
+.spacer{flex:1}
+.kbd-hint,.drag-hint{font-size:12px;color:var(--tx-3)}
+.drag-hint{display:block}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:0 5px}
+
+/* Sections */
+section.block{padding:28px 0;border-top:1px solid var(--line)}
+section.block h2{font-family:var(--serif);font-weight:600;font-size:clamp(26px,3.6vw,34px);margin:0 0 8px;letter-spacing:-.01em}
+section.block .sub{color:var(--tx-2);margin:0 0 20px;max-width:680px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.card i{font-size:24px;color:var(--ia)}
+.card h3{font-size:16px;margin:8px 0 6px}
+.card p{margin:0;font-size:15px;color:var(--tx-2)}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--tx-3);font-weight:500}
+tr:last-child td{border-bottom:none}
+.row-sub{font-size:12px;line-height:1.4;color:var(--tx-3);margin-top:3px;max-width:360px}
+td.mag{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.chip{display:inline-block;font-size:12px;font-weight:500;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.chip.hu{background:var(--hu-bg);color:var(--hu-tx)}
+.chip.ia{background:var(--ia-bg);color:var(--ia-tx)}
+.chip.teo{background:var(--surface-2);color:var(--tx-2)}
+.chip.uni{background:color-mix(in srgb,var(--uni) 18%,transparent);color:var(--uni)}
+.bar{position:relative;height:10px;background:var(--surface-2);border-radius:99px;min-width:120px;overflow:hidden}
+.bar span{position:absolute;inset:0 auto 0 0;border-radius:99px}
+.bar.over span{right:0;background-image:repeating-linear-gradient(-45deg,transparent 0 4px,rgba(255,255,255,.35) 4px 8px)}
+.zcol{font-family:var(--mono);font-size:13px;text-align:right;white-space:nowrap}
+.table-note{font-size:13px;color:var(--tx-3);margin:10px 0 0}
+.warn-list{display:grid;gap:10px;padding:0;margin:0;list-style:none}
+.warn-list li{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;color:var(--tx-2);font-size:15px}
+.warn-list li i{font-size:20px;color:var(--bb);flex:none;margin-top:1px}
+.sources{columns:2 320px;column-gap:28px;padding-left:18px;margin:0;font-size:14px;color:var(--tx-2)}
+.sources li{margin-bottom:8px;break-inside:avoid}
+footer{padding:28px 0 48px;color:var(--tx-3);font-size:13px;border-top:1px solid var(--line)}
+footer a{color:var(--tx-2)}
+
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.anim-in{animation:fadeUp .35s ease both}
+
+@media (max-width:760px){
+  .stage{padding:16px;border-radius:18px}
+  .intro-grid,.zoom,.more-body,.duel{grid-template-columns:minmax(0,1fr)}
+  header.top nav a{display:none}
+  .vs{flex-direction:row;min-width:0}
+  .vs small{max-width:none}
+  .takeaways{grid-template-columns:1fr}
+  .recap-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kbd-hint{display:none}
+  .more-label{display:none}
+  .lbl-long{display:none}
+  .lbl-short{display:inline}
+  .stage .zoom,.stage .intro-grid{grid-template-columns:minmax(0,1fr)}
+  .stage .canvas-wrap,.stage .dotbox{width:min(100%,46vh);margin:0 auto}
+  .stage .side{height:auto}
+  .stage .zoom .zeros-n{font-size:40px}
+  .stage.is-fs .legend{display:none}
+  .side .zeros .n{font-size:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a href="#" data-i18n-aria="homeAria" aria-label="Inicio"><i class="ti ti-circle-dot" aria-hidden="true"></i> <span data-i18n="brand">Contado en ceros</span></a>
+    <nav>
+      <a href="#fundamentos" data-i18n="navBasics">Fundamentos</a>
+      <a href="#tabla" data-i18n="navTable">Tabla</a>
+      <a href="#fuentes" data-i18n="navSources">Fuentes</a>
+      <div class="lang" role="group" data-i18n-aria="langAria" aria-label="Idioma">
+        <button type="button" data-lang="es" lang="es" aria-pressed="true" title="Español">ES</button>
+        <button type="button" data-lang="en" lang="en" aria-pressed="false" title="English">EN</button>
+      </div>
+      <button class="icon-btn" id="theme" data-i18n-aria="themeAria" aria-label="Cambiar tema"><i class="ti ti-moon" aria-hidden="true"></i></button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow" data-i18n="eyebrow">Una visualización interactiva</div>
+    <h1 data-i18n="h1"><span class="hu">Humano</span> vs <span class="ia">IA</span>,<br>contado en ceros</h1>
+    <p class="lede" data-i18n="lede">¿Es una IA «más grande» que un cerebro? Depende de qué contemos. Aquí lo comparamos todo con una sola regla: <strong>cada punto es un cero</strong>, y cada punto más multiplica la cifra por diez.</p>
+    <button class="btn primary cta" id="hero-play"><i class="ti ti-player-play-filled" aria-hidden="true"></i><span id="hero-play-label">Ver el viaje</span></button>
+  </section>
+
+  <main class="stage" id="stage" aria-roledescription="presentación">
+    <div class="progress" id="progress" role="tablist" data-i18n-aria="stepsAria" aria-label="Pasos"></div>
+
+    <div class="step-head">
+      <div>
+        <div class="phase"><span id="phase"></span><span aria-hidden="true">·</span><span class="count" id="count"></span></div>
+        <h2 class="step-title" id="title"></h2>
+      </div>
+    </div>
+
+    <div id="views">
+    <!-- Vista 0: cómo leer -->
+    <div class="view" id="v-intro" hidden>
+      <div class="intro-grid">
+        <div class="dotbox" id="intro-dots" aria-hidden="true"></div>
+        <div>
+          <div class="big-number" id="intro-num" aria-live="polite">1</div>
+          <div class="big-word" id="intro-word"></div>
+          <label for="intro-range" class="drag-hint" data-i18n="dragHint">Arrastra para añadir ceros</label>
+          <input type="range" id="intro-range" min="0" max="9" value="3" step="1">
+          <div class="range-labels"><span data-i18n="range0">0 ceros</span><span data-i18n="range9">9 ceros</span></div>
+          <div class="example" id="intro-ex" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista 1: cara a cara -->
+    <div class="view" id="v-duel" hidden>
+      <div class="duel">
+        <div class="side hu">
+          <div class="who"><i class="ti ti-user" aria-hidden="true"></i><span data-i18n="human">Ser humano</span></div>
+          <div class="what" id="hu-what"></div>
+          <div class="zeros"><div class="n" id="hu-n">0</div><span data-i18n="zerosWord">ceros</span></div>
+          <div class="approx" id="hu-approx"></div>
+          <canvas id="hu-cv" role="img"></canvas>
+        </div>
+        <div class="vs" aria-live="polite">
+          <div class="badge" id="vs-badge">×10</div>
+          <small id="vs-txt"></small>
+        </div>
+        <div class="side ia">
+          <div class="who"><i class="ti ti-robot" aria-hidden="true"></i><span data-i18n="ai">IA (modelo de lenguaje)</span></div>
+          <div class="what" id="ia-what"></div>
+          <div class="zeros"><div class="n" id="ia-n">0</div><span data-i18n="zerosWord">ceros</span></div>
+          <div class="approx" id="ia-approx"></div>
+          <canvas id="ia-cv" role="img"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista 2: alejamiento -->
+    <div class="view" id="v-zoom" hidden>
+      <div class="zoom">
+        <div class="canvas-wrap"><canvas id="zoom-cv" role="img"></canvas></div>
+        <div>
+          <div class="zeros-n" id="zoom-n" aria-live="off">0</div>
+          <div class="zeros-u" data-i18n="zerosOnScreen">ceros en pantalla</div>
+          <ul class="legend" id="legend"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista 3: conclusión -->
+    <div class="view" id="v-outro" hidden>
+      <div class="takeaways">
+        <div class="take"><i class="ti ti-scale" aria-hidden="true" style="color:var(--hu)"></i><h3 data-i18n="take1h">Escalas parecidas</h3><p data-i18n="take1p">Humano e IA se mueven entre 4 y 15 ceros. En vocabulario y conceptos la IA va un cero por delante; en conexiones físicas, el cerebro le saca tres.</p></div>
+        <div class="take"><i class="ti ti-infinity" aria-hidden="true" style="color:var(--uni)"></i><h3 data-i18n="take2h">Un espacio inmenso</h3><p data-i18n="take2p">El espacio en el que trabaja un LLM tiene decenas de miles de ceros: deja pequeño incluso al número de átomos del universo (80 ceros).</p></div>
+        <div class="take"><i class="ti ti-school" aria-hidden="true" style="color:var(--ia)"></i><h3 data-i18n="take3h">Lo que cuenta es aprender</h3><p data-i18n="take3p">Casi todo ese espacio es ruido sin significado. Lo que el modelo aprovecha de verdad depende del entrenamiento, no del tamaño del espacio.</p></div>
+      </div>
+      <div class="recap">
+        <div class="recap-h" data-i18n="recapH">El viaje en ceros · toca una cifra para volver a ese paso</div>
+        <div class="recap-grid" id="recap"></div>
+      </div>
+    </div>
+    </div>
+
+    <p class="caption anim-in" id="caption" aria-live="polite"></p>
+
+
+    <div class="controls">
+      <button class="btn" id="prev" data-i18n-aria="prevAria" aria-label="Paso anterior"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
+      <button class="btn primary" id="play"></button>
+      <button class="btn" id="more-btn" data-i18n-aria="more" aria-label="Para entenderlo mejor" aria-expanded="false" aria-controls="more-panel"><i class="ti ti-bulb" aria-hidden="true"></i><span class="more-label" data-i18n="more">Para entenderlo mejor</span></button>
+      <button class="btn" id="fs-exit" data-i18n-aria="fsExit" aria-label="Salir de pantalla completa"><i class="ti ti-minimize" aria-hidden="true"></i></button>
+      <span class="spacer"></span>
+      <span class="kbd-hint" data-i18n="kbd"><kbd>←</kbd> <kbd>→</kbd> para navegar · <kbd>espacio</kbd> vídeo</span>
+      <button class="btn" id="next"></button>
+    </div>
+    <div class="more-body" id="more-panel" hidden>
+      <div class="box"><b><i class="ti ti-bulb" aria-hidden="true"></i><span data-i18n="idea">La idea</span></b><span id="more-idea"></span></div>
+      <div class="box"><b><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="careful">Con cuidado</span></b><span id="more-warn"></span></div>
+    </div>
+  </main>
+
+  <section class="block" id="fundamentos">
+    <h2 data-i18n="basicsH">Fundamentos</h2>
+    <p class="sub" data-i18n="basicsSub">Un LLM no manipula palabras, sino vectores de miles de dimensiones que se refinan capa a capa.</p>
+    <div class="cards">
+      <div class="card"><i class="ti ti-puzzle" aria-hidden="true"></i><h3 data-i18n="c1h">Tokens y embeddings</h3><p data-i18n="c1p">El texto se divide en tokens (palabras o trozos de palabra). Cada token se convierte en un <strong>vector</strong>: una lista de, por ejemplo, 4.096 o 12.288 números que resume su significado. Es la «representación» de esa palabra dentro de la IA.</p></div>
+      <div class="card"><i class="ti ti-eye" aria-hidden="true"></i><h3 data-i18n="c2h">Atención</h3><p data-i18n="c2p">En cada capa, cada token puede consultar a cualquier token anterior, aunque esté a cientos de miles de posiciones. Así el vector de «banco» cambia según hable de un parque o de un préstamo.</p></div>
+      <div class="card"><i class="ti ti-stack-2" aria-hidden="true"></i><h3 data-i18n="c3h">Capas apiladas</h3><p data-i18n="c3p">Las primeras resuelven sintaxis, las intermedias referencias y las últimas integran todo para la tarea. Cada capa suma su aportación al mismo flujo de vectores (<em>residual stream</em>).</p></div>
+      <div class="card"><i class="ti ti-arrows-split-2" aria-hidden="true"></i><h3 data-i18n="c4h">Superposición</h3><p data-i18n="c4p">Cada concepto se guarda como una <strong>dirección</strong>: imagina una flecha que apunta hacia un lado concreto en ese espacio de miles de números. Si dos flechas son casi perpendiculares, sus conceptos apenas se mezclan. En alta dimensión caben muchísimas más flechas así que dimensiones hay, y el modelo lo aprovecha para guardar muchos más conceptos, a costa de algo de interferencia.</p></div>
+      <div class="card"><i class="ti ti-cpu" aria-hidden="true"></i><h3 data-i18n="c5h">Dimensión y coste</h3><p data-i18n="c5p">Duplicar la dimensión multiplica por unos cuatro los parámetros de las capas principales. Lo que más pesa en la calidad es el total de parámetros, datos y cómputo de entrenamiento.</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="tabla">
+    <h2 data-i18n="tableH">Tabla de magnitudes</h2>
+    <p class="sub" data-i18n="tableSub">Todas las cifras del viaje en un solo sitio. La barra muestra los ceros en una escala de 0 a 80; las rayadas se salen de la escala.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th data-i18n="th1">Qué contamos</th><th data-i18n="th2">Grupo</th><th data-i18n="th3">Orden de magnitud</th><th data-i18n="th4">Ceros</th><th style="width:28%" data-i18n="th5">Escala (0–80)</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="table-note" data-i18n="tableNote">«Ceros» es el logaritmo decimal redondeado: 40.000 ≈ 10⁴,⁶ se cuenta como 4 o 5 según la estimación. Son órdenes de magnitud, no cifras exactas.</p>
+  </section>
+
+  <section class="block" id="rigor">
+    <h2 data-i18n="rigorH">Advertencias de rigor</h2>
+    <p class="sub" data-i18n="rigorSub">Comparar cerebros y modelos es útil para hacerse una idea, pero tiene trampas.</p>
+    <ul class="warn-list">
+      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w1">Los puntos representan ceros: es una escala logarítmica. Un punto más no es «un poco más», es <strong>diez veces más</strong>.</span></li>
+      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w2">En el alejamiento, cada referencia ocupa los primeros puntos hasta su número de ceros: todas empiezan en la esquina y se solapan. Por eso cada bola lleva un anillo por cada referencia que la cuenta. No es una suma de cantidades.</span></li>
+      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w3">«Conceptos de una persona» y «rasgos de un LLM» no miden exactamente lo mismo; la comparación es orientativa.</span></li>
+      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w4">Una sinapsis no equivale a un parámetro: una sinapsis es una pieza biológica con dinámica propia; un parámetro es un número.</span></li>
+      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w5">La capacidad de conceptos (direcciones casi independientes) depende mucho de la tolerancia elegida: cuánto se permite que dos conceptos se «mezclen».</span></li>
+      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w6">Que una lista de 12.288 números pueda tomar muchísimos valores no significa que todos sean útiles: casi todas esas combinaciones son ruido sin significado.</span></li>
+    </ul>
+  </section>
+
+  <section class="block" id="fuentes">
+    <h2 data-i18n="sourcesH">Fuentes</h2>
+    <p class="sub" data-i18n="sourcesSub">Referencias para cada cifra. Las estimaciones sin fuente consolidada están marcadas como tales.</p>
+    <ol class="sources">
+      <li data-i18n="s1">Caras: Jenkins, Dowsett y Burton (2018). <a href="https://doi.org/10.1098/rspb.2018.1319">How many faces do people know?</a> <em>Proc. R. Soc. B</em>.</li>
+      <li data-i18n="s2">Palabras: Brysbaert et al. (2016). <a href="https://doi.org/10.3389/fpsyg.2016.01116">How many words do we know?</a> <em>Frontiers in Psychology</em>.</li>
+      <li data-i18n="s3">Vocabulario de tokens: tokenizador <code>cl100k_base</code>, ~100.000 tokens. <a href="https://github.com/openai/tiktoken">openai/tiktoken</a>.</li>
+      <li data-i18n="s4">Conceptos de una persona (10⁵–10⁶): estimación orientativa, sin fuente consolidada.</li>
+      <li data-i18n="s5">Rasgos en un LLM: Templeton et al. (2024). <a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/">Scaling Monosemanticity</a>. Anthropic.</li>
+      <li data-i18n="s6">Neuronas: Azevedo et al. (2009). <a href="https://doi.org/10.1002/cne.21974">Equal numbers of neuronal and nonneuronal cells…</a> <em>J. Comp. Neurol.</em></li>
+      <li data-i18n="s7">Sinapsis (10¹⁴–10¹⁵) y consumo (~20 W): <a href="https://en.wikipedia.org/wiki/Human_brain">Human brain</a>, Wikipedia, y referencias allí citadas.</li>
+      <li data-i18n="s8">Parámetros y dimensión 12.288: Brown et al. (2020). <a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a> (GPT-3).</li>
+      <li data-i18n="s9">Superposición: Elhage et al. (2022). <a href="https://transformer-circuits.pub/2022/toy_model/">Toy Models of Superposition</a>.</li>
+      <li data-i18n="s10">Capacidad de conceptos (direcciones casi perpendiculares): <a href="https://en.wikipedia.org/wiki/Johnson%E2%80%93Lindenstrauss_lemma">lema de Johnson–Lindenstrauss</a>.</li>
+      <li data-i18n="s11">Edad del universo (13.800 millones de años): <a href="https://en.wikipedia.org/wiki/Age_of_the_universe">Age of the universe</a>, Wikipedia.</li>
+      <li data-i18n="s12">Átomos del universo observable (~10⁸⁰): <a href="https://en.wikipedia.org/wiki/Observable_universe">Observable universe</a>, Wikipedia.</li>
+      <li data-i18n="s13">Formas de guardar una palabra y textos posibles: cálculo propio (2<sup>16 × 12.288</sup> y 100.000<sup>200.000</sup>).</li>
+    </ol>
+  </section>
+
+  <footer data-i18n="footer">
+    Hecho con HTML, CSS y JavaScript, sin dependencias de compilación.
+  </footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cssVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+/* ---------- Datos numéricos (comunes a todos los idiomas) ---------- */
+const BANDS = [
+  {to:12,      v:'--ia'},
+  {to:15,      v:'--hu'},
+  {to:18,      v:'--bb'},
+  {to:30,      v:'--dir'},
+  {to:80,      v:'--uni'},
+  {to:59185,   v:'--vec'},
+  {to:1000000, v:'--rest'}
+];
+const bandIndex = idx => { for (let b = 0; b < BANDS.length; b++) if (idx < BANDS[b].to) return b; return BANDS.length - 1; };
+const STEPS = [
+  {type:'intro'},
+  {type:'duel', hu:4, ia:5},
+  {type:'duel', hu:6, ia:7},
+  {type:'duel', hu:15, ia:12},
+  {type:'zoom', n:18},
+  {type:'zoom', n:30},
+  {type:'zoom', n:80},
+  {type:'zoom', n:59185},
+  {type:'zoom', n:1000000},
+  {type:'outro'}
+];
+const EXAMPLE_ICONS = ['ti-user','ti-hand-stop','ti-hourglass','ti-mood-smile','ti-book','ti-puzzle','ti-clock','ti-bulb','ti-users','ti-world'];
+const ROWS = [['hu',3],['hu',4],['ia',5],['hu',6],['ia',7],['hu',11],['uni',11],['ia',12],['hu',15],['uni',18],['teo',30],['uni',80],['teo',59185],['teo',1000000]];
+
+/* ---------- Textos ---------- */
+const plural = (n, one, many) => n === 1 ? one : many;
+const T = {
+  es: {
+    sep: '.',
+    title: 'Humano vs IA, contado en ceros',
+    desc: 'Una visualización interactiva que compara, contando ceros, lo que maneja un ser humano, lo que maneja un modelo de lenguaje y el espacio teórico en el que trabaja.',
+    hashWord: 'paso',
+    ui: {}, // se rellena con el texto en español del propio HTML
+    stageRole: 'presentación',
+    next: 'Siguiente', restart: 'Volver a empezar',
+    play: 'Ver como vídeo', playShort: 'Vídeo', pause: 'Pausa',
+    heroPlay: m => `Ver el viaje · ${m} min`, playAria: 'Reproducir a pantalla completa, como un vídeo', pauseAria: 'Pausar',
+    count: (k, n) => `${k} de ${n}`,
+    stepAria: (k, t) => `Paso ${k}: ${t}`,
+    introWord: (w, z) => `${w} · ${z} ${plural(z, 'cero', 'ceros')}`,
+    introHint: 'Sin ceros: el número 1. Añade uno y será diez.',
+    approx: (a, w) => `${a} · escrito: ${w}`,
+    advantage: (d, huWins) => `${d} ${plural(d, 'cero', 'ceros')} de ventaja para ${huWins ? 'el humano' : 'la IA'}`,
+    dotsAria: (z, hu, what, a) => `${z} puntos ${hu ? 'verdes' : 'morados'}: ${what}, ${a}`,
+    gridAria: n => `Cuadrícula de ${n} puntos, uno por cero. Los primeros puntos, en la esquina superior izquierda, son el humano y la IA.`,
+    ringAria: ' Un círculo marca el universo y todo lo anterior, y una lupa lo amplía con sus colores.',
+    inset: m => `Lupa ×${m}: los primeros 80 ceros`,
+    vecLabel: 'formas de guardar una palabra (59.185 ceros)',
+    byStretch: 'Ver todas a la vez',
+    zerosN: z => `${z} ceros`,
+    barAria: n => `${n} ceros`,
+    bands: ['IA: parámetros de un LLM grande','Humano: sinapsis del cerebro','Segundos desde el Big Bang','Capacidad de conceptos de la IA','Átomos del universo observable','Formas de guardar una palabra','Textos posibles de 200.000 tokens'],
+    words: ['uno','diez','cien','mil','diez mil','cien mil','un millón','diez millones','cien millones','mil millones'],
+    examples: ['Tú: una persona','Los dedos de tus manos','Los años de un siglo','Caras que reconoces (~5.000)','Palabras que conoces (~40.000)','Tokens del vocabulario de un LLM (~100.000)','Segundos en once días y medio','Rasgos hallados dentro de un LLM (~10 millones)','Habitantes de México (~130 millones)','Habitantes de la India (~1.400 millones)'],
+    groups: {hu:'Humano', ia:'IA', uni:'Universo', teo:'Teórico'},
+    rows: [
+      ['Caras que reconoce una persona','~5.000'],
+      ['Palabras que conoce un adulto','20.000–40.000'],
+      ['Vocabulario de tokens de un LLM','~100.000'],
+      ['Conceptos de una persona','10⁵–10⁶'],
+      ['Rasgos internos hallados en un LLM','~10⁷'],
+      ['Neuronas del cerebro','~8,6 × 10¹⁰'],
+      ['Estrellas de la Vía Láctea','1–4 × 10¹¹'],
+      ['Parámetros de un LLM grande','10¹¹–10¹²'],
+      ['Sinapsis del cerebro','10¹⁴–10¹⁵'],
+      ['Segundos desde el Big Bang','~4,4 × 10¹⁷'],
+      ['Capacidad de conceptos de la IA (potencial)','10²⁰–10³⁰','Cuántos conceptos distintos cabrían en una lista de 12.288 números sin apenas mezclarse (en jerga, «direcciones casi independientes»).'],
+      ['Átomos del universo observable','~10⁸⁰'],
+      ['Formas distintas en que la IA puede guardar una palabra','~10⁵⁹·¹⁸⁵','Cuántas listas distintas de 12.288 números de 16 bits se podrían formar (en jerga, configuraciones de un «vector»).'],
+      ['Textos posibles de 200.000 tokens','~10¹·⁰⁰⁰·⁰⁰⁰']
+    ],
+    steps: [
+      {phase:'Antes de empezar', title:'Cómo leer los puntos',
+       caption:'Un 1 seguido de ceros: cada cero que añades multiplica la cifra por diez. Por eso, en este viaje, contaremos ceros en lugar de cifras. Prueba a mover el control.',
+       idea:'Es una escala logarítmica: en lugar de dibujar la cantidad, dibujamos cuántas veces hay que multiplicar por diez para llegar a ella. Así caben en la misma pantalla cosas de tamaños muy distintos.',
+       warn:'Un punto de diferencia parece poco, pero es multiplicar por diez. Tres puntos son mil veces más.'},
+      {phase:'Fase 1 · Cara a cara', title:'Palabras',
+       hu:['Palabras que conoce un adulto','~40.000'], ia:['Vocabulario de tokens de un LLM','~100.000'],
+       caption:'La IA maneja un vocabulario de piezas de palabra algo mayor que el tuyo: un cero más.',
+       idea:'Un LLM no lee palabras enteras sino tokens: palabras frecuentes completas y trozos para las raras. Con unas 100.000 piezas puede escribir cualquier palabra en cualquier idioma.',
+       warn:'Un token no es una palabra: «inconstitucional» puede ser tres tokens. Comparar vocabularios es orientativo.'},
+      {phase:'Fase 1 · Cara a cara', title:'Conceptos',
+       hu:['Conceptos que maneja una persona','10⁵–10⁶'], ia:['Rasgos internos hallados en un LLM','~10⁷'],
+       caption:'De nuevo un solo cero de diferencia: la IA representa unas diez veces más conceptos, porque ha leído muchísimo más.',
+       idea:'Con técnicas de interpretabilidad (sparse autoencoders) se han encontrado millones de «rasgos» dentro de un modelo: direcciones que se activan con ideas concretas, como «el Golden Gate» o «código con errores».',
+       warn:'La cifra humana es una estimación generosa sin fuente consolidada, y la de la IA es un límite inferior. Miden cosas parecidas, no idénticas.'},
+      {phase:'Fase 1 · Cara a cara', title:'El hardware',
+       hu:['Sinapsis del cerebro','10¹⁴–10¹⁵'], ia:['Parámetros de un LLM grande','10¹¹–10¹²'],
+       caption:'Aquí gana el humano: tus conexiones tienen tres ceros más (unas mil veces más) y funcionan con unos 20 vatios, lo que una bombilla.',
+       idea:'Tu cerebro tiene unos 86.000 millones de neuronas (11 ceros), casi tantas como estrellas en la Vía Láctea, y cada una se conecta con miles de otras.',
+       warn:'Una sinapsis no equivale a un parámetro: es una pieza biológica con dinámica propia, no un simple número.'},
+      {phase:'Fase 2 · Alejamiento', title:'Comparado con la edad del universo',
+       label:'Segundos desde el Big Bang (~4 × 10¹⁷)',
+       caption:'Alejamos la cámara. Los 15 ceros del humano y los 12 de la IA siguen en la esquina; el tiempo transcurrido desde el Big Bang, contado en segundos, añade solo tres ceros más.',
+       idea:'13.800 millones de años son unos 435.000 billones de segundos. Parece enorme, pero en ceros está a la vuelta de la esquina del cerebro humano.',
+       warn:'Cada referencia ocupa los primeros puntos hasta su número de ceros: todas empiezan en la esquina y se solapan, no se suman. Cada bola lleva un anillo por cada referencia que la cuenta; toca la leyenda para ver una sola.'},
+      {phase:'Fase 2 · Alejamiento', title:'¿Cuántos conceptos podría llegar a guardar la IA?',
+       label:'Capacidad: conceptos que cabrían en una lista de 12.288 números sin apenas mezclarse (10²⁰–10³⁰)',
+       caption:'Cada palabra es una lista de 12.288 números, y cada concepto, una «dirección» en ella. Caben unas 10³⁰ sin apenas mezclarse. Es capacidad, no conocimiento: lo encontrado de verdad son unos 10⁷ (paso «Conceptos»).',
+       idea:'En una habitación solo puedes poner 3 flechas totalmente perpendiculares: largo, ancho y alto. Pero si aceptas que estén «casi» perpendiculares, en un espacio de miles de dimensiones caben cantidades astronómicas. Esto es lo que permite la superposición.',
+       warn:'La cifra depende muchísimo de la tolerancia elegida: entre 20 y 30 ceros según cuánto permitamos que interfieran.'},
+      {phase:'Fase 2 · Alejamiento', title:'Comparado con los átomos del universo',
+       label:'Átomos del universo observable (~10⁸⁰)',
+       caption:'Todos los átomos del universo observable: 80 ceros. Humano, IA, tiempo y capacidad de conceptos caben dentro: toca cada referencia en la leyenda para ver cuánto ocupa.',
+       idea:'Se suele usar 10⁸⁰ como ejemplo del «número más grande con sentido físico». En el siguiente paso veremos que la IA lo supera de largo.',
+       warn:'Es una estimación de orden de magnitud: según el método va de 10⁷⁸ a 10⁸².'},
+      {phase:'Fase 2 · Alejamiento', title:'¿De cuántas formas puede la IA guardar una palabra?',
+       label:'Combinaciones posibles de una lista de 12.288 números de 16 bits',
+       caption:'Cada palabra es una lista de 12.288 números (un «vector»). Contando todas las listas posibles salen 59.185 ceros: humano, IA y universo quedan en una mancha de la esquina, que amplía la lupa.',
+       idea:'Cada número de la lista ocupa 16 bits, así que la lista entera son 196.608 bits: 2¹⁹⁶·⁶⁰⁸ combinaciones posibles, unos 10⁵⁹·¹⁸⁵. Es como un candado con 12.288 ruedas de 65.536 posiciones cada una.',
+       warn:'Casi todas esas combinaciones son ruido sin significado. Que existan no quiere decir que el modelo las use.'},
+      {phase:'Fase 2 · Alejamiento', title:'¿Cuántos textos distintos podría escribir la IA?',
+       label:'Textos posibles de 200.000 tokens con un vocabulario de 100.000',
+       caption:'Un millón de ceros, un punto por píxel. Todo lo anterior cabe en la esquina que amplía la lupa; el recuadro son las formas de guardar una palabra del paso anterior.',
+       idea:'Con 100.000 tokens posibles en cada una de las 200.000 posiciones, hay 100.000²⁰⁰·⁰⁰⁰ = 10¹·⁰⁰⁰·⁰⁰⁰ textos distintos. Escrito entero, este número ocuparía cientos de páginas.',
+       warn:'La inmensa mayoría de esos textos son galimatías. El entrenamiento enseña al modelo a moverse solo por la diminuta región que tiene sentido.'},
+      {phase:'Final', title:'Qué nos llevamos',
+       caption:'Humano e IA son comparables en escala. Lo que es verdaderamente inmenso es el espacio en el que trabaja el modelo, y lo que lo hace útil es el aprendizaje.',
+       idea:'Un modelo más grande no es automáticamente mejor: lo que más pesa en la calidad es el total de parámetros, datos y cómputo de entrenamiento.',
+       warn:'Todas las cifras son órdenes de magnitud aproximados. Revisa la tabla y las fuentes más abajo.'}
+    ]
+  },
+  en: {
+    sep: ',',
+    title: 'Human vs AI, counted in zeros',
+    desc: 'An interactive visualization that compares, by counting zeros, what a human handles, what a language model handles and the theoretical space it works in.',
+    hashWord: 'step',
+    stageRole: 'slideshow',
+    next: 'Next', restart: 'Start over',
+    play: 'Watch as video', playShort: 'Video', pause: 'Pause',
+    heroPlay: m => `Watch the journey · ${m} min`, playAria: 'Play full screen, like a video', pauseAria: 'Pause',
+    count: (k, n) => `${k} of ${n}`,
+    stepAria: (k, t) => `Step ${k}: ${t}`,
+    introWord: (w, z) => `${w} · ${z} ${plural(z, 'zero', 'zeros')}`,
+    introHint: 'No zeros: the number 1. Add one and it becomes ten.',
+    approx: (a, w) => `${a} · written: ${w}`,
+    advantage: (d, huWins) => `${d} ${plural(d, 'zero', 'zeros')} ahead for ${huWins ? 'the human' : 'the AI'}`,
+    dotsAria: (z, hu, what, a) => `${z} ${hu ? 'green' : 'purple'} dots: ${what}, ${a}`,
+    gridAria: n => `Grid of ${n} dots, one per zero. The first dots, in the top-left corner, are the human and the AI.`,
+    ringAria: ' A circle marks the universe and everything before it, and a magnifier enlarges it in color.',
+    inset: m => `Magnifier ×${m}: the first 80 zeros`,
+    vecLabel: 'ways to store one word (59,185 zeros)',
+    byStretch: 'Show all at once',
+    zerosN: z => `${z} zeros`,
+    barAria: n => `${n} zeros`,
+    bands: ['AI: parameters of a large LLM','Human: brain synapses','Seconds since the Big Bang','Concept capacity of the AI','Atoms in the observable universe','Ways to store one word','Possible texts of 200,000 tokens'],
+    words: ['one','ten','one hundred','one thousand','ten thousand','one hundred thousand','one million','ten million','one hundred million','one billion'],
+    examples: ['You: one person','The fingers on your hands','The years in a century','Faces you recognize (~5,000)','Words you know (~40,000)','Tokens in an LLM vocabulary (~100,000)','Seconds in eleven and a half days','Features found inside an LLM (~10 million)','People living in Mexico (~130 million)','People living in India (~1.4 billion)'],
+    groups: {hu:'Human', ia:'AI', uni:'Universe', teo:'Theoretical'},
+    rows: [
+      ['Faces a person recognizes','~5,000'],
+      ['Words an adult knows','20,000–40,000'],
+      ['Token vocabulary of an LLM','~100,000'],
+      ['Concepts a person holds','10⁵–10⁶'],
+      ['Internal features found in an LLM','~10⁷'],
+      ['Neurons in the brain','~8.6 × 10¹⁰'],
+      ['Stars in the Milky Way','1–4 × 10¹¹'],
+      ['Parameters of a large LLM','10¹¹–10¹²'],
+      ['Synapses in the brain','10¹⁴–10¹⁵'],
+      ['Seconds since the Big Bang','~4.4 × 10¹⁷'],
+      ['Concept capacity of the AI (potential)','10²⁰–10³⁰','How many distinct concepts could fit in a list of 12,288 numbers with barely any overlap (in jargon, “nearly independent directions”).'],
+      ['Atoms in the observable universe','~10⁸⁰'],
+      ['Different ways an AI can store a word','~10⁵⁹ ¹⁸⁵','How many different lists of 12,288 16-bit numbers could be formed (in jargon, configurations of a “vector”).'],
+      ['Possible texts of 200,000 tokens','~10¹ ⁰⁰⁰ ⁰⁰⁰']
+    ],
+    steps: [
+      {phase:'Before we start', title:'How to read the dots',
+       caption:'A 1 followed by zeros: every zero you add multiplies the number by ten. That is why, on this journey, we will count zeros instead of digits. Try moving the slider.',
+       idea:'This is a logarithmic scale: instead of drawing the quantity, we draw how many times you have to multiply by ten to reach it. That way, things of wildly different sizes fit on the same screen.',
+       warn:'One dot of difference looks small, but it means ten times more. Three dots means a thousand times more.'},
+      {phase:'Phase 1 · Head to head', title:'Words',
+       hu:['Words an adult knows','~40,000'], ia:['Token vocabulary of an LLM','~100,000'],
+       caption:'The AI works with a vocabulary of word pieces somewhat larger than yours: one more zero.',
+       idea:'An LLM does not read whole words but tokens: common words in full and fragments for rare ones. With about 100,000 pieces it can spell any word in any language.',
+       warn:'A token is not a word: “unconstitutional” can be three tokens. Comparing vocabularies is only a rough guide.'},
+      {phase:'Phase 1 · Head to head', title:'Concepts',
+       hu:['Concepts a person holds','10⁵–10⁶'], ia:['Internal features found in an LLM','~10⁷'],
+       caption:'Again just one zero apart: the AI represents about ten times more concepts, because it has read vastly more.',
+       idea:'Using interpretability techniques (sparse autoencoders), researchers have found millions of “features” inside a model: directions that light up for specific ideas, such as “the Golden Gate Bridge” or “buggy code”.',
+       warn:'The human figure is a generous estimate with no established source, and the AI figure is a lower bound. They measure similar things, not identical ones.'},
+      {phase:'Phase 1 · Head to head', title:'The hardware',
+       hu:['Synapses in the brain','10¹⁴–10¹⁵'], ia:['Parameters of a large LLM','10¹¹–10¹²'],
+       caption:'Here the human wins: your connections have three more zeros (about a thousand times more) and run on roughly 20 watts, like a light bulb.',
+       idea:'Your brain has about 86 billion neurons (11 zeros), almost as many as there are stars in the Milky Way, and each one connects to thousands of others.',
+       warn:'A synapse is not the same as a parameter: it is a biological component with its own dynamics, not just a number.'},
+      {phase:'Phase 2 · Zooming out', title:'Compared with the age of the universe',
+       label:'Seconds since the Big Bang (~4 × 10¹⁷)',
+       caption:'We pull the camera back. The human’s 15 zeros and the AI’s 12 stay in the corner; the time since the Big Bang, counted in seconds, adds only three more zeros.',
+       idea:'13.8 billion years is about 435 quadrillion seconds. It sounds huge, but in zeros it is just around the corner from the human brain.',
+       warn:'Each reference fills the first dots up to its number of zeros: they all start in the corner and overlap, they do not add up. Each dot gets one ring per reference that counts it; tap the legend to see just one.'},
+      {phase:'Phase 2 · Zooming out', title:'How many concepts could an AI hold?',
+       label:'Capacity: concepts that would fit in a list of 12,288 numbers with barely any overlap (10²⁰–10³⁰)',
+       caption:'Each word is a list of 12,288 numbers, and each concept a “direction” within it. About 10³⁰ fit with barely any overlap. That is capacity, not knowledge: what has actually been found is about 10⁷ (the “Concepts” step).',
+       idea:'In a room you can only place 3 fully perpendicular arrows: length, width and height. But if you accept “almost” perpendicular, a space with thousands of dimensions holds astronomical numbers of them. This is what makes superposition possible.',
+       warn:'The figure depends heavily on the chosen tolerance: between 20 and 30 zeros depending on how much interference we allow.'},
+      {phase:'Phase 2 · Zooming out', title:'Compared with the atoms in the universe',
+       label:'Atoms in the observable universe (~10⁸⁰)',
+       caption:'Every atom in the observable universe: 80 zeros. Human, AI, time and concept capacity all fit inside: tap each reference in the legend to see how much it takes up.',
+       idea:'10⁸⁰ is often used as the example of “the largest number with physical meaning”. In the next step we will see the AI leave it far behind.',
+       warn:'It is an order-of-magnitude estimate: depending on the method it ranges from 10⁷⁸ to 10⁸².'},
+      {phase:'Phase 2 · Zooming out', title:'In how many ways can an AI store a word?',
+       label:'Possible combinations of a list of 12,288 16-bit numbers',
+       caption:'Each word is a list of 12,288 numbers (a “vector”). Counting every possible list gives 59,185 zeros: human, AI and universe end up as a speck in the corner, enlarged by the magnifier.',
+       idea:'Each number in the list takes 16 bits, so the whole list is 196,608 bits: 2¹⁹⁶ ⁶⁰⁸ possible combinations, about 10⁵⁹ ¹⁸⁵. Think of a combination lock with 12,288 dials of 65,536 positions each.',
+       warn:'Almost all of those combinations are meaningless noise. Their existence does not mean the model uses them.'},
+      {phase:'Phase 2 · Zooming out', title:'How many different texts could an AI write?',
+       label:'Possible texts of 200,000 tokens with a 100,000-token vocabulary',
+       caption:'A million zeros, one dot per pixel. Everything so far fits in the corner the magnifier enlarges; the framed square is the ways to store a word from the previous step.',
+       idea:'With 100,000 possible tokens in each of 200,000 positions, there are 100,000²⁰⁰ ⁰⁰⁰ = 10¹ ⁰⁰⁰ ⁰⁰⁰ different texts. Written out, this number would fill hundreds of pages.',
+       warn:'The vast majority of those texts are gibberish. Training teaches the model to move only through the tiny region that makes sense.'},
+      {phase:'The end', title:'Key takeaways',
+       caption:'Humans and AI are comparable in scale. What is truly immense is the space the model works in, and what makes it useful is learning.',
+       idea:'A bigger model is not automatically better: what matters most for quality is the total of parameters, data and training compute.',
+       warn:'All figures are approximate orders of magnitude. Check the table and the sources below.'}
+    ],
+    ui: {
+      homeAria: 'Home', brand: 'Counted in zeros',
+      navBasics: 'Basics', navTable: 'Table', navSources: 'Sources',
+      langAria: 'Language', themeAria: 'Toggle theme',
+      eyebrow: 'An interactive visualization',
+      h1: '<span class="hu">Human</span> vs <span class="ia">AI</span>,<br>counted in zeros',
+      lede: 'Is an AI “bigger” than a brain? It depends on what we count. Here we compare everything with a single rule: <strong>each dot is a zero</strong>, and each extra dot multiplies the number by ten.',
+      stepsAria: 'Steps',
+      dragHint: 'Drag to add zeros', range0: '0 zeros', range9: '9 zeros',
+      recapH: 'The journey in zeros · tap a figure to revisit that step',
+      human: 'Human', ai: 'AI (language model)', zerosWord: 'zeros', zerosOnScreen: 'zeros on screen',
+      take1h: 'Similar scales', take1p: 'Humans and AI both sit between 4 and 15 zeros. In vocabulary and concepts the AI is one zero ahead; in physical connections, the brain is three ahead.',
+      take2h: 'An immense space', take2p: 'The space an LLM works in has tens of thousands of zeros: it dwarfs even the number of atoms in the universe (80 zeros).',
+      take3h: 'Learning is what counts', take3p: 'Almost all of that space is meaningless noise. What the model actually makes use of depends on training, not on the size of the space.',
+      more: 'Dig deeper', idea: 'The idea', careful: 'Careful',
+      prevAria: 'Previous step', fsExit: 'Exit full screen',
+      kbd: '<kbd>←</kbd> <kbd>→</kbd> to navigate · <kbd>space</kbd> video',
+      basicsH: 'Basics', basicsSub: 'An LLM does not handle words, but vectors with thousands of dimensions that are refined layer by layer.',
+      c1h: 'Tokens and embeddings', c1p: 'Text is split into tokens (words or pieces of words). Each token becomes a <strong>vector</strong>: a list of, for example, 4,096 or 12,288 numbers that sums up its meaning. It is that word’s “representation” inside the AI.',
+      c2h: 'Attention', c2p: 'In each layer, every token can look at any earlier token, even hundreds of thousands of positions back. That is how the vector for “bank” changes depending on whether it is about a river or a loan.',
+      c3h: 'Stacked layers', c3p: 'Early layers handle syntax, middle layers resolve references and the last ones bring everything together for the task. Each layer adds its contribution to the same stream of vectors (the <em>residual stream</em>).',
+      c4h: 'Superposition', c4p: 'Each concept is stored as a <strong>direction</strong>: picture an arrow pointing a particular way in that space of thousands of numbers. If two arrows are nearly perpendicular, their concepts barely mix. In high dimensions there is room for far more such arrows than there are dimensions, and the model uses this to store many more concepts, at the cost of some interference.',
+      c5h: 'Dimension and cost', c5p: 'Doubling the dimension multiplies the parameters of the main layers by about four. What matters most for quality is the total of parameters, data and training compute.',
+      tableH: 'Table of magnitudes', tableSub: 'Every figure from the journey in one place. The bar shows zeros on a 0 to 80 scale; striped bars go off the scale.',
+      th1: 'What we count', th2: 'Group', th3: 'Order of magnitude', th4: 'Zeros', th5: 'Scale (0–80)',
+      tableNote: '“Zeros” is the rounded base-10 logarithm: 40,000 ≈ 10⁴·⁶ counts as 4 or 5 depending on the estimate. These are orders of magnitude, not exact figures.',
+      rigorH: 'Caveats', rigorSub: 'Comparing brains and models helps build intuition, but it has pitfalls.',
+      w1: 'The dots stand for zeros: it is a logarithmic scale. One more dot is not “a bit more”, it is <strong>ten times more</strong>.',
+      w2: 'When zooming out, each reference fills the first dots up to its number of zeros: they all start in the corner and overlap. That is why each dot gets one ring per reference that counts it. It is not a sum of quantities.',
+      w3: '“Concepts a person holds” and “features in an LLM” do not measure exactly the same thing; the comparison is only a rough guide.',
+      w4: 'A synapse is not the same as a parameter: a synapse is a biological component with its own dynamics; a parameter is a number.',
+      w5: 'The concept capacity (nearly independent directions) depends heavily on the chosen tolerance: how much two concepts are allowed to “mix”.',
+      w6: 'The fact that a list of 12,288 numbers can take a huge number of values does not make them all useful: almost all of those combinations are meaningless noise.',
+      sourcesH: 'Sources', sourcesSub: 'References for each figure. Estimates without an established source are marked as such.',
+      s1: 'Faces: Jenkins, Dowsett and Burton (2018). <a href="https://doi.org/10.1098/rspb.2018.1319">How many faces do people know?</a> <em>Proc. R. Soc. B</em>.',
+      s2: 'Words: Brysbaert et al. (2016). <a href="https://doi.org/10.3389/fpsyg.2016.01116">How many words do we know?</a> <em>Frontiers in Psychology</em>.',
+      s3: 'Token vocabulary: the <code>cl100k_base</code> tokenizer, ~100,000 tokens. <a href="https://github.com/openai/tiktoken">openai/tiktoken</a>.',
+      s4: 'Concepts a person holds (10⁵–10⁶): rough estimate, no established source.',
+      s5: 'Features in an LLM: Templeton et al. (2024). <a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/">Scaling Monosemanticity</a>. Anthropic.',
+      s6: 'Neurons: Azevedo et al. (2009). <a href="https://doi.org/10.1002/cne.21974">Equal numbers of neuronal and nonneuronal cells…</a> <em>J. Comp. Neurol.</em>',
+      s7: 'Synapses (10¹⁴–10¹⁵) and power use (~20 W): <a href="https://en.wikipedia.org/wiki/Human_brain">Human brain</a>, Wikipedia, and references cited there.',
+      s8: 'Parameters and dimension 12,288: Brown et al. (2020). <a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a> (GPT-3).',
+      s9: 'Superposition: Elhage et al. (2022). <a href="https://transformer-circuits.pub/2022/toy_model/">Toy Models of Superposition</a>.',
+      s10: 'Concept capacity (nearly perpendicular directions): <a href="https://en.wikipedia.org/wiki/Johnson%E2%80%93Lindenstrauss_lemma">Johnson–Lindenstrauss lemma</a>.',
+      s11: 'Age of the universe (13.8 billion years): <a href="https://en.wikipedia.org/wiki/Age_of_the_universe">Age of the universe</a>, Wikipedia.',
+      s12: 'Atoms in the observable universe (~10⁸⁰): <a href="https://en.wikipedia.org/wiki/Observable_universe">Observable universe</a>, Wikipedia.',
+      s13: 'Ways to store a word and possible texts: our own calculation (2<sup>16 × 12,288</sup> and 100,000<sup>200,000</sup>).',
+      footer: 'Built with HTML, CSS and JavaScript, no build step required.'
+    }
+  }
+};
+
+/* El español vive en el propio HTML: lo recogemos como diccionario base. */
+document.querySelectorAll('[data-i18n]').forEach(el => { T.es.ui[el.dataset.i18n] = el.innerHTML.trim(); });
+document.querySelectorAll('[data-i18n-aria]').forEach(el => { T.es.ui[el.dataset.i18nAria] = el.getAttribute('aria-label'); });
+
+/* ---------- Idioma ---------- */
+const detectLang = () => {
+  try { const s = localStorage.getItem('lang'); if (s === 'es' || s === 'en') return s; } catch (e) {}
+  const prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+  return /^es\b/i.test(prefs[0] || '') ? 'es' : 'en';
+};
+let lang = detectLang();
+const L = () => T[lang];
+const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, L().sep);
+const stepText = k => L().steps[k];
+
+/* ---------- Exponentes ----------
+   ¹ ² ³ son caracteres antiguos (Latin-1) y muchas fuentes los dibujan
+   distintos de ⁰ ⁴…⁹. Convertimos cada exponente en <sup> con cifras normales. */
+const SUP_MAP = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','·':'.','\u2009':',',' ':',',',':','};
+const SUP_RE = /[⁰¹²³⁴-⁹]+(?:[·\u2009 ,][⁰¹²³⁴-⁹]+)*/g;
+function supify(root) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
+  while (walker.nextNode()) { SUP_RE.lastIndex = 0; if (SUP_RE.test(walker.currentNode.nodeValue)) nodes.push(walker.currentNode); }
+  nodes.forEach(node => {
+    const frag = document.createDocumentFragment(), text = node.nodeValue;
+    let last = 0;
+    text.replace(SUP_RE, (m, i) => {
+      frag.append(text.slice(last, i));
+      const sup = document.createElement('sup');
+      sup.textContent = [...m].map(c => SUP_MAP[c] ?? c).join('');
+      frag.append(sup); last = i + m.length; return m;
+    });
+    frag.append(text.slice(last));
+    node.replaceWith(frag);
+  });
+}
+
+/* ---------- Estado ---------- */
+let cur = -1, raf = 0, timers = [], playing = false, autoTimer = 0, zoomSide = Math.sqrt(15);
+const stopAnims = () => { cancelAnimationFrame(raf); timers.forEach(clearTimeout); timers = []; };
+
+/* ---------- Progreso ---------- */
+const progress = $('progress');
+STEPS.forEach((s, k) => {
+  const b = document.createElement('button');
+  b.setAttribute('role', 'tab');
+  b.onclick = () => { stopAuto(); go(k); };
+  progress.appendChild(b);
+});
+
+/* ---------- Canvas con nitidez en pantallas HiDPI ---------- */
+function fit(cv, ratio) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  const h = ratio ? w * ratio : (cv.clientHeight || w);
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  // Con ratio, la altura sale de la proporción del propio lienzo (height:auto),
+  // así no se deforma si el contenedor cambia de tamaño (p. ej. pantalla completa).
+  if (ratio) cv.style.height = 'auto';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return {ctx, w, h};
+}
+
+/* ---------- Paso 0: cómo leer ---------- */
+function renderIntro() {
+  const z = +$('intro-range').value, t = L();
+  $('intro-num').innerHTML = '1' + (z ? '<span class="z">' + fmt(10 ** z).slice(1) + '</span>' : '');
+  $('intro-word').textContent = t.introWord(t.words[z], z);
+  $('intro-ex').innerHTML = `<i class="ti ${EXAMPLE_ICONS[z]}" aria-hidden="true"></i><span>${t.examples[z]}</span>`;
+  const box = $('intro-dots');
+  box.innerHTML = z ? '' : `<div class="hint">${t.introHint}</div>`;
+  for (let k = 0; k < z; k++) {
+    const d = document.createElement('div'); d.className = 'd';
+    d.style.animationDelay = (k * 40) + 'ms'; box.appendChild(d);
+  }
+}
+$('intro-range').addEventListener('input', renderIntro);
+
+/* ---------- Fase 1: cara a cara ---------- */
+// Todas las comparaciones usan la misma rejilla (la de la que tiene más bolas),
+// así las cajas y las bolas miden lo mismo en todos los pasos.
+const DUEL_MAX = Math.max(...STEPS.filter(st => st.type === 'duel').map(st => Math.max(st.hu, st.ia)));
+function duelLayout() { const cols = 5, rows = Math.ceil(DUEL_MAX / cols); return {cols, rows}; }
+// Las bolas ocupan el hueco que deja la cabecera del panel (de alto fijo en escritorio).
+function sizeDuelCanvas(cv, ratio) {
+  const side = cv.parentElement;
+  cv.style.width = '';
+  if (matchMedia('(max-width:760px)').matches) return;
+  const approx = side.querySelector('.approx');
+  const avail = side.clientHeight - (approx.offsetTop + approx.offsetHeight + 10) - 16;
+  cv.style.width = Math.max(60, Math.min(side.clientWidth - 32, avail / ratio)) + 'px';
+}
+function drawDuel(cv, n, color, numEl, delay) {
+  const {cols, rows} = duelLayout();
+  sizeDuelCanvas(cv, rows / cols);
+  const {ctx, w} = fit(cv, rows / cols);
+  const cell = w / cols, r = cell * 0.36;
+  const t0 = reduced ? -Infinity : performance.now() + delay, per = reduced ? 0 : 110, popDur = reduced ? 1 : 320;
+  const frame = now => {
+    ctx.clearRect(0, 0, w, w);
+    let shown = 0, done = true;
+    for (let k = 0; k < n; k++) {
+      const t = (now - t0 - k * per) / popDur;
+      if (t <= 0) { done = false; continue; }
+      const p = Math.min(1, t), e = p < 1 ? 1 + 2.2 * Math.pow(p - 1, 3) + 1.2 * Math.pow(p - 1, 2) : 1;
+      if (p < 1) done = false;
+      shown++;
+      const x = (k % cols) * cell + cell / 2, y = Math.floor(k / cols) * cell + cell / 2;
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, Math.max(0, r * e), 0, Math.PI * 2); ctx.fill();
+    }
+    numEl.textContent = shown;
+    return done;
+  };
+  return frame;
+}
+function renderDuel(st, tx) {
+  const t = L(), [huWhat, huApprox] = tx.hu, [iaWhat, iaApprox] = tx.ia;
+  $('hu-what').textContent = huWhat; $('ia-what').textContent = iaWhat;
+  $('hu-approx').textContent = t.approx(huApprox, fmt(10 ** st.hu));
+  $('ia-approx').textContent = t.approx(iaApprox, fmt(10 ** st.ia));
+  const diff = Math.abs(st.hu - st.ia);
+  $('vs-badge').textContent = '×' + fmt(10 ** diff);
+  $('vs-txt').textContent = t.advantage(diff, st.hu > st.ia);
+  $('hu-cv').setAttribute('aria-label', t.dotsAria(st.hu, true, huWhat, huApprox));
+  $('ia-cv').setAttribute('aria-label', t.dotsAria(st.ia, false, iaWhat, iaApprox));
+  const f1 = drawDuel($('hu-cv'), st.hu, cssVar('--hu'), $('hu-n'), 0);
+  const f2 = drawDuel($('ia-cv'), st.ia, cssVar('--ia'), $('ia-n'), 60);
+  const loop = now => { const a = f1(now), b = f2(now); if (!(a && b)) raf = requestAnimationFrame(loop); else stepDone(); };
+  raf = requestAnimationFrame(loop);
+}
+
+/* ---------- Fase 2: alejamiento ----------
+   Disposición en «capas cuadradas»: los primeros m² puntos llenan siempre un
+   cuadrado m×m en la esquina. Así, al alejar la cámara, todo lo anterior se
+   queda quieto en la esquina superior izquierda. */
+const shellPos = k => { const m = Math.floor(Math.sqrt(k)), r = k - m * m; return r < m ? [m, r] : [r - m, m]; };
+const shellIdx = (x, y) => { const m = Math.max(x, y); return x === m && y < m ? m * m + y : m * m + m + x; };
+const hexToRgb = h => { h = h.replace('#', ''); if (h.length === 3) h = h.replace(/./g, c => c + c); const v = parseInt(h, 16); return [v >> 16 & 255, v >> 8 & 255, v & 255]; };
+
+let zoomCache = null;
+/* Referencia resaltada (índice de BANDS) o -1 para la vista «todas a la vez».
+   Al resaltar, sus puntos 1…z se pintan de su color dentro de una zona
+   tintada y bordeada, y el resto se atenúa: así se ve su magnitud completa,
+   no solo su tramo nuevo. */
+let sel = -1, zoomRedraw = null;
+const paintOf = k => sel < 0 ? [bandIndex(k), false] : k < BANDS[sel].to ? [sel, false] : [bandIndex(k), true];
+/* Zona que ocupan los primeros z puntos: fondo tintado y contorno. */
+function drawRegion(ctx, z, ox, oy, cell, color) {
+  const inR = (x, y) => x >= 0 && y >= 0 && shellIdx(x, y) < z;
+  const fill = new Path2D(), edge = new Path2D();
+  for (let k = 0; k < z; k++) {
+    const [x, y] = shellPos(k), px = ox + x * cell, py = oy + y * cell;
+    fill.rect(px, py, cell + .5, cell + .5);
+    if (!inR(x, y - 1)) { edge.moveTo(px, py); edge.lineTo(px + cell, py); }
+    if (!inR(x, y + 1)) { edge.moveTo(px, py + cell); edge.lineTo(px + cell, py + cell); }
+    if (!inR(x - 1, y)) { edge.moveTo(px, py); edge.lineTo(px, py + cell); }
+    if (!inR(x + 1, y)) { edge.moveTo(px + cell, py); edge.lineTo(px + cell, py + cell); }
+  }
+  ctx.globalAlpha = .22; ctx.fillStyle = color; ctx.fill(fill); ctx.globalAlpha = 1;
+  ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineCap = 'square'; ctx.stroke(edge);
+}
+const DIM = .18;
+// Las capas se pintan de fuera hacia dentro (clave: banda|atenuado|profundidad).
+function fillGroups(ctx, colors, groups) {
+  [...groups.keys()].sort((a, b) => a.split('|')[2] - b.split('|')[2]).forEach(key => {
+    const [b, d] = key.split('|'); ctx.globalAlpha = d === '1' ? DIM : 1; ctx.fillStyle = colors[b]; ctx.fill(groups.get(key));
+  });
+  ctx.globalAlpha = 1;
+}
+function addCircle(groups, key, cx, cy, r) {
+  let p = groups.get(key); if (!p) groups.set(key, p = new Path2D());
+  p.moveTo(cx + r, cy); p.arc(cx, cy, r, 0, Math.PI * 2);
+}
+/* maxB: la mayor referencia «pequeña» (hasta el universo) presente en el paso.
+   En la vista «todas a la vez», un cero que cuentan varias referencias se
+   dibuja como anillos concéntricos: por fuera la mayor, en el centro la menor. */
+function addDot(groups, k, cx, cy, r, maxB) {
+  const [b, d] = paintOf(k);
+  if (sel >= 0 || b > maxB) { addCircle(groups, `${b}|${d ? 1 : 0}|0`, cx, cy, r); return; }
+  const step = r * 0.62 / Math.max(1, maxB);
+  for (let o = maxB; o >= b; o--) addCircle(groups, `${o}|0|${maxB - o}`, cx, cy, r - (maxB - o) * step);
+}
+const ringMax = n => { let m = 0; for (let i = 0; i <= 4; i++) if (BANDS[i].to <= n) m = i; return m; };
+function buildImage(n, colors) {
+  const S = Math.ceil(Math.sqrt(n));
+  const off = document.createElement('canvas'); off.width = S; off.height = S;
+  const octx = off.getContext('2d'), img = octx.createImageData(S, S), d = img.data;
+  const rgb = colors.map(hexToRgb);
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+    const k = shellIdx(x, y); if (k >= n) continue;
+    const c = rgb[bandIndex(k)], o = (y * S + x) * 4;
+    d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255;
+  }
+  octx.putImageData(img, 0, 0);
+  return off;
+}
+function drawZoom(ctx, w, side, n, colors, img, showRing) {
+  ctx.clearRect(0, 0, w, w);
+  const cell = w / side;
+  if (cell >= 5) {
+    const lim = Math.min(n, Math.ceil(side) ** 2), r = cell * (cell > 14 ? 0.38 : 0.42);
+    if (sel >= 0) drawRegion(ctx, Math.min(BANDS[sel].to, lim), 0, 0, cell, colors[sel]);
+    const groups = new Map(), maxB = ringMax(n);
+    for (let k = 0; k < lim; k++) {
+      const [x, y] = shellPos(k); if (x >= side || y >= side) continue;
+      addDot(groups, k, x * cell + cell / 2, y * cell + cell / 2, r, maxB);
+    }
+    fillGroups(ctx, colors, groups);
+  } else {
+    ctx.imageSmoothingEnabled = false;
+    const src = Math.min(side, img.width);
+    if (sel >= 0) ctx.globalAlpha = DIM;
+    ctx.drawImage(img, 0, 0, src, src, 0, 0, src * cell, src * cell);
+    ctx.globalAlpha = 1;
+    if (sel >= 0) {
+      const q = Math.min(w, Math.max(3, Math.ceil(Math.sqrt(BANDS[sel].to)) * cell));
+      ctx.globalAlpha = .45; ctx.fillStyle = colors[sel]; ctx.fillRect(0, 0, q, q); ctx.globalAlpha = 1;
+      ctx.strokeStyle = colors[sel]; ctx.lineWidth = 2; ctx.strokeRect(1, 1, q - 1, q - 1);
+    }
+  }
+  if (showRing) drawMagnifier(ctx, w, cell, n, colors);
+}
+/* Lupa: amplía los primeros 80 ceros (humano, IA, tiempo, conceptos y
+   universo), que a esta escala ocupan menos de un píxel. */
+function drawMagnifier(ctx, w, cell, n, colors) {
+  const t = L(), tx = cssVar('--tx'), line = cssVar('--line-strong');
+  // Los 80 primeros ceros ocupan un cuadrado de 9×9 puntos pegado a la esquina.
+  const blob = Math.max(3, 9 * cell), c = blob / 2, rad = Math.max(18, blob * 0.75 + 10);
+  // Recuadro de «formas de guardar una palabra» (solo visible en el último paso)
+  const vs = n > 59185 ? Math.ceil(Math.sqrt(59185)) * cell : 0;
+  if (vs) {
+    ctx.strokeStyle = tx; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+    ctx.strokeRect(0.75, 0.75, vs, vs); ctx.setLineDash([]);
+  }
+  // Marca exacta de esos 80 ceros y círculo centrado en ella (en la esquina se ve como un arco)
+  ctx.strokeStyle = tx; ctx.lineWidth = 1.5; ctx.strokeRect(0.75, 0.75, blob, blob);
+  ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.arc(c, c, rad, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+  // Panel de la lupa
+  const S = Math.round(Math.min(w * 0.5, 260)), x0 = w - S - 10, y0 = w - S - 10, pad = 12, head = 22;
+  const gs = S - pad * 2 - head, gx = x0 + (S - gs) / 2, gy = y0 + pad + head, ci = gs / 9;
+  // Línea que une círculo y lupa
+  const a = Math.atan2(y0 - c, x0 - c);
+  ctx.strokeStyle = tx; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(c + Math.cos(a) * rad, c + Math.sin(a) * rad); ctx.lineTo(x0 + 8, y0 + 8); ctx.stroke(); ctx.setLineDash([]);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
+  ctx.fillStyle = cssVar('--surface');
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(x0, y0, S, S, 14); else ctx.rect(x0, y0, S, S);
+  ctx.fill(); ctx.restore();
+  ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.stroke();
+  const title = t.inset(fmt(ci / cell));
+  ctx.font = '600 12px Inter, system-ui, sans-serif';
+  const fs = Math.max(9, Math.min(12, 12 * (S - pad * 2) / ctx.measureText(title).width));
+  ctx.font = `600 ${fs.toFixed(1)}px Inter, system-ui, sans-serif`; ctx.fillStyle = tx;
+  ctx.fillText(title, x0 + pad, y0 + pad + 10);
+  const groups = new Map(), r = ci * 0.38;
+  if (sel >= 0) drawRegion(ctx, Math.min(BANDS[sel].to, 80), gx, gy, ci, colors[sel]);
+  for (let k = 0; k < 80; k++) {
+    const [x, y] = shellPos(k);
+    addDot(groups, k, gx + x * ci + ci / 2, gy + y * ci + ci / 2, r, 4);
+  }
+  fillGroups(ctx, colors, groups);
+  if (vs) pill(ctx, t.vecLabel, 6, vs + 18, tx);
+}
+function pill(ctx, text, x, y, color) {
+  ctx.font = '600 12px Inter, system-ui, sans-serif';
+  const tw = ctx.measureText(text).width;
+  ctx.fillStyle = cssVar('--bg'); ctx.globalAlpha = .88; ctx.fillRect(x - 4, y - 13, tw + 8, 18); ctx.globalAlpha = 1;
+  ctx.fillStyle = color; ctx.fillText(text, x, y);
+}
+function renderZoom(st, tx) {
+  const t = L(), n = st.n, colors = BANDS.map(b => cssVar(b.v));
+  const items = BANDS.map((b, k) => k > 0 && BANDS[k - 1].to >= n ? '' :
+    `<li><button type="button" data-b="${k}"><span class="sw" style="background:var(${b.v})"></span>${t.bands[k]}<span class="rng">${t.zerosN(fmt(Math.min(b.to, n)))}</span></button></li>`).join('');
+  $('legend').innerHTML = items + `<li><button type="button" data-b="-1"><span class="sw all"></span>${t.byStretch}</button></li>`;
+  const syncLegend = () => $('legend').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.b === sel));
+  $('legend').querySelectorAll('button').forEach(b => b.onclick = () => {
+    sel = +b.dataset.b; syncLegend(); stopAuto();
+    if (zoomRedraw) zoomRedraw();
+  });
+  syncLegend();
+  const cv = $('zoom-cv');
+  cv.setAttribute('aria-label', `${tx.label}. ` + t.gridAria(fmt(n)) + (n > 80 ? t.ringAria : ''));
+  const {ctx, w} = fit(cv);
+  // Lado entero: así la última fila/columna de puntos nunca queda cortada.
+  const target = Math.ceil(Math.sqrt(n));
+  if (!zoomCache || zoomCache.n !== n || zoomCache.theme !== themeKey()) zoomCache = {n, theme: themeKey(), img: buildImage(n, colors)};
+  const img = zoomCache.img, from = Math.max(1, Math.min(zoomSide, target));
+  const dur = reduced ? 0 : 900 + 450 * Math.log10(Math.max(1, target / from) * 10);
+  const t0 = performance.now(), num = $('zoom-n'), ring = n > 80;
+  const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const frame = now => {
+    const p = dur ? Math.min(1, (now - t0) / dur) : 1;
+    const side = Math.exp(Math.log(from) + (Math.log(target) - Math.log(from)) * ease(p));
+    const s = Math.max(side, Math.sqrt(Math.min(n, 4)));
+    drawZoom(ctx, w, Math.max(s, 2), n, colors, img, ring && p >= 1);
+    num.textContent = fmt(Math.min(n, p >= 1 ? n : Math.round(s * s)));
+    zoomSide = side;
+    if (p < 1) raf = requestAnimationFrame(frame); else stepDone();
+  };
+  zoomRedraw = () => { cancelAnimationFrame(raf); drawZoom(ctx, w, target, n, colors, img, ring); num.textContent = fmt(n); };
+  raf = requestAnimationFrame(frame);
+}
+
+/* ---------- Altura fija ----------
+   Cada tipo de paso ocupa una altura distinta y los textos tienen 1–3 líneas.
+   Medimos todos los pasos y fijamos la altura del más alto para que la
+   presentación no «salte» al avanzar. Se repite al cambiar tamaño, idioma o
+   pantalla completa. */
+let measuring = false;
+function lockHeights() {
+  const parts = [$('title'), $('views'), $('caption')];
+  const keep = {cur, sel, zoomSide, playing};
+  parts.forEach(el => el.style.minHeight = '');
+  measuring = true; playing = false;
+  const max = parts.map(() => 0);
+  STEPS.forEach((_, k) => {
+    go(k, true);
+    parts.forEach((el, i) => { max[i] = Math.max(max[i], el.offsetHeight); });
+    if (isFs()) beatsOf(k).slice(1).forEach(b => { showBeat(...b); max[2] = Math.max(max[2], parts[2].offsetHeight); });
+  });
+  measuring = false; playing = keep.playing;
+  parts.forEach((el, i) => el.style.minHeight = max[i] + 'px');
+  // Volver al paso en el que estábamos sin reiniciar su estado
+  cur = keep.cur; sel = keep.sel; zoomSide = keep.zoomSide;
+  go(keep.cur, true);
+}
+
+/* ---------- Navegación ---------- */
+function setHash() { history.replaceState(null, '', `#${L().hashWord}-${cur + 1}`); }
+function go(k, fromHash) {
+  stopAnims();
+  const prevStep = STEPS[cur];
+  cur = (k + STEPS.length) % STEPS.length;
+  const st = STEPS[cur], tx = stepText(cur), t = L();
+  if (st.type !== 'zoom' || !prevStep || prevStep.type !== 'zoom') zoomSide = Math.sqrt(15);
+  // Al entrar en un paso se muestran todas las referencias a la vez.
+  if (st.type === 'zoom' && prevStep !== st) sel = -1;
+  zoomRedraw = null;
+  $('phase').textContent = tx.phase;
+  $('count').textContent = t.count(cur + 1, STEPS.length);
+  $('title').textContent = tx.title;
+  const cap = $('caption'); cap.textContent = tx.caption; cap.classList.remove('anim-in'); void cap.offsetWidth; cap.classList.add('anim-in');
+  $('more-idea').textContent = tx.idea; $('more-warn').textContent = tx.warn;
+  clearTiming();
+  [...progress.children].forEach((b, j) => { b.classList.toggle('on', j === cur); b.classList.toggle('done', j < cur); b.setAttribute('aria-selected', j === cur); });
+  $('prev').disabled = cur === 0;
+  $('next').innerHTML = cur === STEPS.length - 1
+    ? `${t.restart} <i class="ti ti-refresh" aria-hidden="true"></i>`
+    : `${t.next} <i class="ti ti-arrow-right" aria-hidden="true"></i>`;
+  ['intro','duel','zoom','outro'].forEach(v => $('v-' + v).hidden = v !== st.type);
+  if (!fromHash) setHash();
+  if (st.type === 'intro') {
+    if (!playing) { renderIntro(); stepDone(); }
+    else {
+      let z = 0;
+      const tick = () => { $('intro-range').value = z; renderIntro(); if (z++ < 6) timers.push(setTimeout(tick, 700)); else stepDone(); };
+      tick();
+    }
+  }
+  else if (st.type === 'duel') renderDuel(st, tx);
+  else if (st.type === 'zoom') renderZoom(st, tx);
+  else stepDone();
+  supify($('stage')); // exponentes en los textos recién escritos
+}
+/* En modo vídeo cada paso muestra tres «subtítulos» seguidos: su texto,
+   «La idea» y «Con cuidado». Cada uno dura según su longitud. */
+const readMs = text => Math.min(14000, Math.max(4500, text.length * 60));
+const ANIM_MS = {intro: 4900, duel: 2200, zoom: 2600, outro: 0}; // duración aproximada de cada animación
+const beatsOf = k => { const tx = L().steps[k]; return [['cap', tx.caption], ['idea', tx.idea], ['warn', tx.warn]]; };
+const videoMinutes = () => Math.max(1, Math.round(STEPS.reduce((ms, st, k) =>
+  ms + ANIM_MS[st.type] + beatsOf(k).reduce((a, [, text]) => a + readMs(text), 0), 0) / 60000));
+function showBeat(kind, text) {
+  const cap = $('caption');
+  cap.textContent = '';
+  if (kind !== 'cap') {
+    const tag = document.createElement('span');
+    tag.className = 'beat-tag ' + kind;
+    tag.innerHTML = `<i class="ti ${kind === 'idea' ? 'ti-bulb' : 'ti-alert-triangle'}" aria-hidden="true"></i>${L().ui[kind === 'idea' ? 'idea' : 'careful']}`;
+    cap.appendChild(tag);
+  }
+  cap.append(text);
+  supify(cap);
+  cap.classList.remove('anim-in'); void cap.offsetWidth; cap.classList.add('anim-in');
+}
+const clearTiming = () => [...progress.children].forEach(b => b.classList.remove('timing'));
+function stepDone() {
+  if (!playing || measuring) return;
+  clearTimeout(autoTimer); clearTiming();
+  const beats = beatsOf(cur), durs = beats.map(([, text]) => readMs(text));
+  const seg = progress.children[cur];
+  seg.style.setProperty('--dur', durs.reduce((a, b) => a + b, 0) + 'ms'); void seg.offsetWidth; seg.classList.add('timing');
+  let i = 0;
+  const nextBeat = () => {
+    if (++i < beats.length) { showBeat(...beats[i]); autoTimer = setTimeout(nextBeat, durs[i]); }
+    else if (cur === STEPS.length - 1) stopAuto();
+    else go(cur + 1);
+  };
+  autoTimer = setTimeout(nextBeat, durs[0]);
+}
+function renderPlay() {
+  const t = L();
+  $('play').innerHTML = playing
+    ? `<i class="ti ti-player-pause" aria-hidden="true"></i><span>${t.pause}</span>`
+    : `<i class="ti ti-player-play-filled" aria-hidden="true"></i><span class="lbl-long">${t.play}</span><span class="lbl-short">${t.playShort}</span>`;
+  $('play').setAttribute('aria-label', playing ? t.pauseAria : t.playAria);
+}
+function startAuto() {
+  playing = true; renderPlay();
+  if (!isFs()) enterFs();
+  go(cur === STEPS.length - 1 ? 0 : cur, true);
+}
+function stopAuto() { playing = false; clearTimeout(autoTimer); clearTiming(); renderPlay(); }
+
+/* ---------- Pantalla completa ---------- */
+const stage = $('stage');
+const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+const isFs = () => fsEl() === stage || stage.classList.contains('fs');
+function fallbackFs() { stage.classList.add('fs'); document.documentElement.style.overflow = 'hidden'; onFsChange(); }
+function enterFs() {
+  const req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+  if (!req) { fallbackFs(); return; }
+  try { const p = req.call(stage); if (p && p.catch) p.catch(fallbackFs); } catch (e) { fallbackFs(); }
+}
+function exitFs() {
+  if (fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else { stage.classList.remove('fs'); document.documentElement.style.overflow = ''; onFsChange(); }
+}
+let wasFs = false;
+function onFsChange() {
+  const on = isFs();
+  if (on === wasFs) return;
+  wasFs = on;
+  stage.classList.toggle('is-fs', on);
+  if (!on && playing) stopAuto();
+  lastW = innerWidth;
+  lockHeights(); // vuelve a medir y dibujar con el nuevo tamaño
+}
+document.addEventListener('fullscreenchange', onFsChange);
+document.addEventListener('webkitfullscreenchange', onFsChange);
+$('fs-exit').onclick = exitFs;
+$('hero-play').onclick = () => { if (cur !== 0) go(0); startAuto(); };
+$('more-btn').onclick = () => {
+  const open = $('more-panel').hidden;
+  $('more-panel').hidden = !open;
+  $('more-btn').setAttribute('aria-expanded', open);
+};
+
+$('next').onclick = () => { stopAuto(); go(cur + 1); };
+$('prev').onclick = () => { stopAuto(); go(cur - 1); };
+$('play').onclick = () => playing ? stopAuto() : startAuto();
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input, textarea')) return;
+  if (e.key === 'ArrowRight') { stopAuto(); go(cur + 1); }
+  else if (e.key === 'ArrowLeft') { stopAuto(); go(cur - 1); }
+  else if (e.key === 'Escape' && stage.classList.contains('fs')) exitFs();
+  else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); playing ? stopAuto() : startAuto(); }
+});
+const fromHash = () => { const m = location.hash.match(/^#(?:paso|step)-(\d+)$/); return m ? Math.min(STEPS.length, Math.max(1, +m[1])) - 1 : null; };
+window.addEventListener('hashchange', () => { const k = fromHash(); if (k !== null && k !== cur) go(k, true); });
+let rt, lastW = innerWidth; window.addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(lockHeights, 150); });
+
+/* ---------- Tema ---------- */
+const root = document.documentElement;
+const themeKey = () => root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+const setThemeIcon = () => { $('theme').innerHTML = `<i class="ti ${themeKey() === 'dark' ? 'ti-sun' : 'ti-moon'}" aria-hidden="true"></i>`; };
+try { const t = localStorage.getItem('theme'); if (t) root.dataset.theme = t; } catch (e) {}
+setThemeIcon();
+$('theme').onclick = () => {
+  root.dataset.theme = themeKey() === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
+  setThemeIcon(); stopAuto(); go(cur, true);
+};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!root.dataset.theme) { setThemeIcon(); go(cur, true); } });
+
+/* ---------- Resumen final: las cifras de cada paso ---------- */
+function renderRecap() {
+  const t = L();
+  $('recap').innerHTML = STEPS.map((st, k) => {
+    if (st.type === 'duel') return [k, `<span class="hu">${st.hu}</span><span class="sep"> · </span><span class="ia">${st.ia}</span>`, t.steps[k].title];
+    if (st.type === 'zoom') return [k, fmt(st.n), t.bands[BANDS.findIndex(b => b.to === st.n)]];
+    return null;
+  }).filter(Boolean).map(([k, z, label]) =>
+    `<button type="button" class="recap-item" data-k="${k}"><span class="rz">${z}</span><span class="rl">${label}</span></button>`).join('');
+  $('recap').querySelectorAll('button').forEach(b => b.onclick = () => { stopAuto(); go(+b.dataset.k); });
+}
+
+/* ---------- Tabla ---------- */
+const barColor = {hu:'var(--hu)', ia:'var(--ia)', uni:'var(--uni)', teo:'var(--tx-3)'};
+function renderTable() {
+  const t = L();
+  $('tbody').innerHTML = ROWS.map(([g, z], k) => { const [q, mag, sub] = t.rows[k]; return `<tr>
+  <td>${q}${sub ? `<div class="row-sub">${sub}</div>` : ''}</td><td><span class="chip ${g}">${t.groups[g]}</span></td><td class="mag">${mag}</td><td class="zcol">${fmt(z)}</td>
+  <td><div class="bar${z > 80 ? ' over' : ''}" role="img" aria-label="${t.barAria(fmt(z))}"><span style="width:${Math.min(100, z / 80 * 100)}%;background-color:${barColor[g]}"></span></div></td></tr>`; }).join('');
+}
+
+/* ---------- Aplicar idioma ---------- */
+function applyLang(next, save) {
+  lang = next;
+  const t = L();
+  if (save) { try { localStorage.setItem('lang', lang); } catch (e) {} }
+  root.lang = lang;
+  document.title = t.title;
+  document.querySelector('meta[property="og:title"]').setAttribute('content', t.title);
+  document.querySelector('meta[name="description"]').setAttribute('content', t.desc);
+  document.querySelectorAll('[data-i18n]').forEach(el => { const v = t.ui[el.dataset.i18n]; if (v != null) el.innerHTML = v; });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { const v = t.ui[el.dataset.i18nAria]; if (v != null) el.setAttribute('aria-label', v); });
+  $('stage').setAttribute('aria-roledescription', t.stageRole);
+  document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang));
+  [...progress.children].forEach((b, k) => b.setAttribute('aria-label', t.stepAria(k + 1, t.steps[k].title)));
+  renderTable(); renderPlay(); renderRecap();
+  supify(document.body);
+  const m = videoMinutes();
+  $('hero-play-label').textContent = t.heroPlay(m);
+}
+document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
+  if (b.dataset.lang === lang) return;
+  applyLang(b.dataset.lang, true);
+  lockHeights(); setHash();
+});
+
+/* ---------- Inicio ---------- */
+applyLang(lang, false);
+cur = fromHash() ?? 0;
+lockHeights();
+// Las fuentes web cambian la altura de los textos al terminar de cargar
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(lockHeights);
+})();
+</script>
+</body>
+</html>
