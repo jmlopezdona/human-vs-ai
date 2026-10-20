@@ -192,6 +192,13 @@ sup{font-size:.62em;line-height:0;vertical-align:.5em;font-variant-numeric:linin
 .beat-tag{display:inline-flex;align-items:center;gap:6px;font-size:.78em;font-weight:600;padding:2px 10px;border-radius:99px;background:var(--surface-2);margin-right:10px;vertical-align:.12em}
 .beat-tag.idea{color:var(--bb)} .beat-tag.warn{color:var(--uni)}
 .btn:disabled{opacity:.4;cursor:default}
+.btn.icon{padding:10px 12px}
+.btn.icon[aria-pressed="false"]{color:var(--tx-3)}
+.vol{display:inline-flex;align-items:center;gap:8px}
+/* Los controles de audio solo se ven en el modo vídeo, a pantalla completa */
+.stage:not(.is-fs) #voice-btn,.stage:not(.is-fs) #music-btn,.stage:not(.is-fs) .vol{display:none}
+.vol input[type=range]{width:96px;margin:0;accent-color:var(--tx)}
+#mute-btn[aria-pressed="true"]{color:var(--tx-3)}
 .spacer{flex:1}
 .kbd-hint,.drag-hint{font-size:12px;color:var(--tx-3)}
 .drag-hint{display:block}
@@ -246,6 +253,7 @@ footer a{color:var(--tx-2)}
   .takeaways{grid-template-columns:1fr}
   .recap-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .kbd-hint{display:none}
+  .vol input[type=range]{display:none} /* en móvil el volumen lo llevan los botones del teléfono */
   .more-label{display:none}
   .lbl-long{display:none}
   .lbl-short{display:inline}
@@ -272,7 +280,8 @@ footer a{color:var(--tx-2)}
       <a href="#tabla" data-i18n="navTable">Tabla</a>
       <a href="#fuentes" data-i18n="navSources">Fuentes</a>
       <div class="lang" role="group" data-i18n-aria="langAria" aria-label="Idioma">
-        <button type="button" data-lang="es" lang="es" aria-pressed="true" title="Español">ES</button>
+        <button type="button" data-lang="es" data-voice="es-ES" lang="es-ES" aria-pressed="true" title="Español de España">ES</button>
+        <button type="button" data-lang="es" data-voice="es-419" lang="es-419" aria-pressed="false" title="Español de Latinoamérica">LATAM</button>
         <button type="button" data-lang="en" lang="en" aria-pressed="false" title="English">EN</button>
       </div>
       <button class="icon-btn" id="theme" data-i18n-aria="themeAria" aria-label="Cambiar tema"><i class="ti ti-moon" aria-hidden="true"></i></button>
@@ -368,6 +377,12 @@ footer a{color:var(--tx-2)}
     <div class="controls">
       <button class="btn" id="prev" data-i18n-aria="prevAria" aria-label="Paso anterior"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
       <button class="btn primary" id="play"></button>
+      <button class="btn icon" id="voice-btn" aria-pressed="true"></button>
+      <button class="btn icon" id="music-btn" aria-pressed="true"></button>
+      <span class="vol">
+        <button class="btn icon" id="mute-btn" aria-pressed="false"></button>
+        <input type="range" id="vol" min="0" max="100" step="5" value="80">
+      </span>
       <button class="btn" id="more-btn" data-i18n-aria="more" aria-label="Para entenderlo mejor" aria-expanded="false" aria-controls="more-panel"><i class="ti ti-bulb" aria-hidden="true"></i><span class="more-label" data-i18n="more">Para entenderlo mejor</span></button>
       <button class="btn" id="fs-exit" data-i18n-aria="fsExit" aria-label="Salir de pantalla completa"><i class="ti ti-minimize" aria-hidden="true"></i></button>
       <span class="spacer"></span>
@@ -486,6 +501,9 @@ const T = {
     next: 'Siguiente', restart: 'Volver a empezar',
     play: 'Ver como vídeo', playShort: 'Vídeo', pause: 'Pausa',
     heroPlay: m => `Ver el viaje · ${m} min`, playAria: 'Reproducir a pantalla completa, como un vídeo', pauseAria: 'Pausar',
+    voiceOn: 'Quitar la voz del narrador', voiceOff: 'Poner la voz del narrador',
+    musicOn: 'Quitar la música', musicOff: 'Poner la música',
+    muteOn: 'Silenciar', muteOff: 'Activar el sonido', volume: v => `Volumen: ${v} %`,
     count: (k, n) => `${k} de ${n}`,
     stepAria: (k, t) => `Paso ${k}: ${t}`,
     introWord: (w, z) => `${w} · ${z} ${plural(z, 'cero', 'ceros')}`,
@@ -580,6 +598,9 @@ const T = {
     next: 'Next', restart: 'Start over',
     play: 'Watch as video', playShort: 'Video', pause: 'Pause',
     heroPlay: m => `Watch the journey · ${m} min`, playAria: 'Play full screen, like a video', pauseAria: 'Pause',
+    voiceOn: 'Mute the narrator', voiceOff: 'Unmute the narrator',
+    musicOn: 'Mute the music', musicOff: 'Unmute the music',
+    muteOn: 'Mute', muteOff: 'Unmute', volume: v => `Volume: ${v}%`,
     count: (k, n) => `${k} of ${n}`,
     stepAria: (k, t) => `Step ${k}: ${t}`,
     introWord: (w, z) => `${w} · ${z} ${plural(z, 'zero', 'zeros')}`,
@@ -727,6 +748,14 @@ const detectLang = () => {
   return /^es\b/i.test(prefs[0] || '') ? 'es' : 'en';
 };
 let lang = detectLang();
+// Voz del español: la elegida, o la del idioma del navegador (es-ES y «es» a
+// secas, España; cualquier otro español, Latinoamérica)
+const detectVoiceEs = () => {
+  try { const s = localStorage.getItem('voiceEs'); if (s === 'es-ES' || s === 'es-419') return s; } catch (e) {}
+  const es = (navigator.languages || [navigator.language || '']).find(l => /^es\b/i.test(l)) || 'es';
+  return /^es(-ES)?$/i.test(es) ? 'es-ES' : 'es-419';
+};
+let voiceEs = detectVoiceEs();
 const L = () => T[lang];
 const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, L().sep);
 const stepText = k => L().steps[k];
@@ -1088,12 +1117,27 @@ function go(k, fromHash) {
   supify($('stage')); // exponentes en los textos recién escritos
 }
 /* En modo vídeo cada paso muestra tres «subtítulos» seguidos: su texto,
-   «La idea» y «Con cuidado». Cada uno dura según su longitud. */
+   «La idea» y «Con cuidado». Con la voz puesta, cada uno dura lo que su
+   locución (audio/<idioma>/<paso>-<subtítulo>.mp3) y una pausa; sin ella,
+   según la longitud del texto. */
 const readMs = text => Math.min(14000, Math.max(4500, text.length * 60));
 const ANIM_MS = {intro: 4900, duel: 2200, zoom: 2600, outro: 0}; // duración aproximada de cada animación
 const beatsOf = k => { const tx = L().steps[k]; return [['cap', tx.caption], ['idea', tx.idea], ['warn', tx.warn]]; };
+// Duración en segundos de cada locución, por voz; la escribe narracion/igualar.py.
+// El texto en español es el mismo y lo dicen dos voces: de España y de Latinoamérica.
+const VOICE_S = {
+  'es-ES': {"1-cap":9.06,"1-idea":12.29,"1-warn":7.38,"2-cap":7.99,"2-idea":11.54,"2-warn":8.54,"3-cap":9.78,"3-idea":11.94,"3-warn":10.96,"4-cap":9.82,"4-idea":9.69,"4-warn":8.03,"5-cap":12.29,"5-idea":11.26,"5-warn":9.52,"6-cap":15.49,"6-idea":15.45,"6-warn":8.79,"7-cap":8.86,"7-idea":10.62,"7-warn":7.89,"8-cap":19.0,"8-idea":18.32,"8-warn":7.85,"9-cap":10.46,"9-idea":11.18,"9-warn":9.62,"10-cap":11.98,"10-idea":9.46,"10-warn":7.02},
+  'es-419': {"1-cap":11.77,"1-idea":14.69,"1-warn":9.27,"2-cap":10.98,"2-idea":14.65,"2-warn":10.99,"3-cap":12.77,"3-idea":14.41,"3-warn":13.43,"4-cap":13.46,"4-idea":11.3,"4-warn":8.44,"5-cap":15.98,"5-idea":13.1,"5-warn":10.19,"6-cap":18.81,"6-idea":18.81,"6-warn":10.52,"7-cap":11.82,"7-idea":13.62,"7-warn":8.22,"8-cap":23.53,"8-idea":21.01,"8-warn":9.62,"9-cap":12.69,"9-idea":15.09,"9-warn":11.95,"10-cap":13.49,"10-idea":11.3,"10-warn":7.83},
+  en: {"1-cap":10.77,"1-idea":15.57,"1-warn":8.75,"2-cap":8.74,"2-idea":15.37,"2-warn":10.21,"3-cap":10.26,"3-idea":14.09,"3-warn":12.2,"4-cap":12.54,"4-idea":10.66,"4-warn":10.08,"5-cap":12.82,"5-idea":12.46,"5-warn":10.26,"6-cap":18.84,"6-idea":17.61,"6-warn":10.98,"7-cap":10.33,"7-idea":11.13,"7-warn":10.61,"8-cap":18.92,"8-idea":18.92,"8-warn":8.16,"9-cap":12.54,"9-idea":13.77,"9-warn":9.59,"10-cap":11.41,"10-idea":10.58,"10-warn":7.19}
+};
+const voiceDir = () => (lang === 'en' ? 'en' : voiceEs);
+const voiceKey = (k, kind) => `${k + 1}-${kind}`;
+const beatMs = (k, kind, text) => {
+  const s = sound.voice && VOICE_S[voiceDir()][voiceKey(k, kind)];
+  return s ? Math.max(2500, s * 1000 + 900) : readMs(text);
+};
 const videoMinutes = () => Math.max(1, Math.round(STEPS.reduce((ms, st, k) =>
-  ms + ANIM_MS[st.type] + beatsOf(k).reduce((a, [, text]) => a + readMs(text), 0), 0) / 60000));
+  ms + ANIM_MS[st.type] + beatsOf(k).reduce((a, [kind, text]) => a + beatMs(k, kind, text), 0), 0) / 60000));
 function showBeat(kind, text) {
   const cap = $('caption');
   cap.textContent = '';
@@ -1108,19 +1152,31 @@ function showBeat(kind, text) {
   cap.classList.remove('anim-in'); void cap.offsetWidth; cap.classList.add('anim-in');
 }
 const clearTiming = () => [...progress.children].forEach(b => b.classList.remove('timing'));
+// Cada subtítulo pasa al siguiente cuando ha durado lo previsto y, además,
+// ha terminado su locución: si el audio llega tarde, no se corta.
+let beatToken = 0;
 function stepDone() {
   if (!playing || measuring) return;
   clearTimeout(autoTimer); clearTiming();
-  const beats = beatsOf(cur), durs = beats.map(([, text]) => readMs(text));
-  const seg = progress.children[cur];
+  const k = cur, beats = beatsOf(k), durs = beats.map(([kind, text]) => beatMs(k, kind, text));
+  const seg = progress.children[k];
   seg.style.setProperty('--dur', durs.reduce((a, b) => a + b, 0) + 'ms'); void seg.offsetWidth; seg.classList.add('timing');
-  let i = 0;
-  const nextBeat = () => {
-    if (++i < beats.length) { showBeat(...beats[i]); autoTimer = setTimeout(nextBeat, durs[i]); }
-    else if (cur === STEPS.length - 1) stopAuto();
-    else go(cur + 1);
+  const runBeat = i => {
+    if (i > 0) showBeat(...beats[i]);
+    const token = ++beatToken;
+    let waiting = 2;
+    const done = () => { if (token === beatToken && --waiting === 0) nextBeat(i); };
+    autoTimer = setTimeout(done, durs[i]);
+    voice.say(voiceKey(k, beats[i][0])).then(done);
+    if (i + 1 < beats.length) voice.preload(voiceKey(k, beats[i + 1][0]));
+    else if (k + 1 < STEPS.length) voice.preload(voiceKey(k + 1, 'cap'));
   };
-  autoTimer = setTimeout(nextBeat, durs[0]);
+  const nextBeat = i => {
+    if (i + 1 < beats.length) runBeat(i + 1);
+    else if (k === STEPS.length - 1) stopAuto();
+    else go(k + 1);
+  };
+  runBeat(0);
 }
 function renderPlay() {
   const t = L();
@@ -1131,10 +1187,200 @@ function renderPlay() {
 }
 function startAuto() {
   playing = true; renderPlay();
+  // Dentro del clic o la tecla: el navegador solo deja sonar audio tras un gesto
+  music.start(); voice.unlock(voiceKey(cur === STEPS.length - 1 ? 0 : cur, 'cap'));
   if (!isFs()) enterFs();
   go(cur === STEPS.length - 1 ? 0 : cur, true);
 }
-function stopAuto() { playing = false; clearTimeout(autoTimer); clearTiming(); renderPlay(); }
+function stopAuto() {
+  playing = false; beatToken++; clearTimeout(autoTimer); clearTiming(); renderPlay();
+  voice.stop(); music.stop();
+}
+
+/* ---------- Sonido del modo vídeo ---------- */
+// La voz y la música se pueden quitar por separado, y el volumen y el
+// silencio valen para las dos; todo se recuerda. Silenciar no quita la voz:
+// los subtítulos siguen el ritmo de las locuciones aunque no se oigan.
+const sound = {voice: true, music: true, volume: 0.8, muted: false};
+const gain = () => (sound.muted ? 0 : sound.volume);
+try { Object.assign(sound, JSON.parse(localStorage.getItem('sound') || '{}')); } catch (e) {}
+
+// Locuciones del narrador, todas por el mismo elemento de audio: en iPhone
+// solo suena desde un temporizador si antes ha sonado tras un clic. `say`
+// devuelve una promesa que se cumple al acabar la locución, al pararla o si
+// no se puede reproducir.
+const voice = (() => {
+  const el = new Audio(), warm = {};
+  let finish = null;
+  const src = key => `audio/${voiceDir()}/${key}.mp3`;
+  const stop = () => {
+    el.pause();
+    music.duck(false);
+    if (finish) { const f = finish; finish = null; f(); }
+  };
+  const end = () => { if (finish) stop(); };
+  el.onended = end; el.onerror = end;
+  return {
+    stop,
+    setVolume() { el.volume = gain(); },
+    // Llamar dentro del clic que arranca el vídeo
+    unlock(key) {
+      if (!sound.voice || !VOICE_S[voiceDir()][key]) return;
+      el.src = src(key); el.muted = true;
+      const p = el.play();
+      if (p && p.then) p.then(() => { el.pause(); el.muted = false; }, () => { el.muted = false; });
+      else el.muted = false;
+    },
+    // Calienta la caché del navegador con la siguiente locución
+    preload(key) {
+      if (!sound.voice || !VOICE_S[voiceDir()][key] || warm[src(key)]) return;
+      const a = new Audio(); a.preload = 'auto'; a.src = src(key); warm[src(key)] = a;
+    },
+    say(key) {
+      stop();
+      if (!sound.voice || !VOICE_S[voiceDir()][key]) return Promise.resolve();
+      return new Promise(resolve => {
+        finish = resolve;
+        el.muted = false; el.volume = gain();
+        el.src = src(key);
+        music.duck(true);
+        const p = el.play();
+        if (p && p.catch) p.catch(() => { if (finish === resolve) stop(); });
+      });
+    }
+  };
+})();
+
+/* Música de fondo, generada en el navegador con Web Audio: un colchón de
+   acordes lentos, un bajo suave y notas sueltas, como puntos que aparecen.
+   Baja de volumen mientras habla el narrador. */
+const music = (() => {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  const LEVEL = 0.35, DUCKED = 0.16, CHORD_S = 8;
+  // La menor: Am9 · Fmaj7 · Cmaj7 · G6, en semitonos sobre La 2 (110 Hz)
+  const CHORDS = [[0, 7, 14, 15, 19], [-4, 3, 12, 15, 19], [3, 10, 14, 19, 22], [-2, 5, 14, 17, 21]];
+  const SPARK = [24, 27, 29, 31, 34, 36, 39]; // pentatónica de La menor, dos octavas arriba
+  const hz = st => 110 * Math.pow(2, st / 12);
+  let ctx = null, out, duckGain, volGain, wet, dry, next = 0, chord = 0, sparkAt = 0, timer = 0, on = false, ducked = false;
+
+  function setup() {
+    ctx = new AC();
+    out = ctx.createGain(); out.gain.value = 0;
+    duckGain = ctx.createGain(); duckGain.gain.value = 1;
+    const comp = ctx.createDynamicsCompressor();
+    volGain = ctx.createGain(); volGain.gain.value = gain();
+    out.connect(duckGain).connect(comp).connect(volGain).connect(ctx.destination);
+    // Reverberación con una respuesta de ruido que decae
+    const len = ctx.sampleRate * 3.5, ir = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5); }
+    const rev = ctx.createConvolver(); rev.buffer = ir;
+    wet = ctx.createGain(); wet.gain.value = 0.55; wet.connect(rev).connect(out);
+    dry = ctx.createGain(); dry.gain.value = 0.45; dry.connect(out);
+  }
+  function tone(freq, t, dur, {type = 'sine', peak = 0.05, attack = 2.5, release = 3, cutoff = 1400, send = 0.6, detune = 0} = {}) {
+    const o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+    o.type = type; o.frequency.value = freq; o.detune.value = detune;
+    f.type = 'lowpass'; f.frequency.value = cutoff; f.Q.value = 0.3;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(peak, t + attack);
+    g.gain.setValueAtTime(peak, t + dur);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur + release);
+    o.connect(f).connect(g);
+    const sw = ctx.createGain(); sw.gain.value = send; g.connect(sw).connect(wet);
+    const sd = ctx.createGain(); sd.gain.value = 1 - send; g.connect(sd).connect(dry);
+    o.start(t); o.stop(t + dur + release + 0.1);
+  }
+  function schedule() {
+    const ahead = ctx.currentTime + 1.5;
+    while (next < ahead) {
+      const notes = CHORDS[chord++ % CHORDS.length];
+      tone(hz(notes[0] - 12), next, CHORD_S - 1, {peak: 0.28, attack: 3, cutoff: 400, send: 0.3});
+      notes.forEach(st => {
+        tone(hz(st), next, CHORD_S - 1.5, {type: 'triangle', peak: 0.07, detune: -6});
+        tone(hz(st), next, CHORD_S - 1.5, {peak: 0.09, detune: 6});
+      });
+      next += CHORD_S;
+    }
+    while (sparkAt < ahead) {
+      const st = SPARK[Math.floor(Math.random() * SPARK.length)];
+      tone(hz(st), sparkAt, 0.05, {peak: 0.12, attack: 0.01, release: 2.2, cutoff: 5000, send: 0.8});
+      sparkAt += 1.6 + Math.random() * 3.2;
+    }
+  }
+  const level = () => (ducked ? DUCKED : LEVEL);
+  return {
+    start() {
+      if (!sound.music || !AC) return;
+      if (!ctx) setup();
+      ctx.resume();
+      const t = ctx.currentTime;
+      if (!on) { on = true; next = Math.max(next, t + 0.1); sparkAt = Math.max(sparkAt, t + 2); }
+      out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t);
+      out.gain.linearRampToValueAtTime(level(), t + 3);
+      clearInterval(timer); schedule(); timer = setInterval(schedule, 500);
+    },
+    stop() {
+      if (!ctx || !on) return;
+      on = false;
+      const t = ctx.currentTime;
+      out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t);
+      out.gain.linearRampToValueAtTime(0, t + 1.5);
+      clearInterval(timer);
+      // Las notas ya programadas se dejan sonar bajo el fundido; luego se suspende
+      setTimeout(() => { if (!on) ctx.suspend(); }, 1700);
+    },
+    setVolume() { if (ctx) volGain.gain.setTargetAtTime(gain(), ctx.currentTime, 0.05); },
+    duck(v) {
+      ducked = v;
+      if (!ctx || !on) return;
+      const t = ctx.currentTime;
+      out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t);
+      out.gain.linearRampToValueAtTime(level(), t + (v ? 0.4 : 1.2));
+    }
+  };
+})();
+
+function renderSound() {
+  const t = L();
+  $('voice-btn').innerHTML = `<i class="ti ${sound.voice ? 'ti-microphone' : 'ti-microphone-off'}" aria-hidden="true"></i>`;
+  $('voice-btn').setAttribute('aria-pressed', sound.voice);
+  $('voice-btn').setAttribute('aria-label', sound.voice ? t.voiceOn : t.voiceOff);
+  $('voice-btn').title = $('voice-btn').getAttribute('aria-label');
+  $('music-btn').innerHTML = `<i class="ti ${sound.music ? 'ti-music' : 'ti-music-off'}" aria-hidden="true"></i>`;
+  $('music-btn').setAttribute('aria-pressed', sound.music);
+  $('music-btn').setAttribute('aria-label', sound.music ? t.musicOn : t.musicOff);
+  $('music-btn').title = $('music-btn').getAttribute('aria-label');
+  const v = Math.round(sound.volume * 100), off = sound.muted || v === 0;
+  $('mute-btn').innerHTML = `<i class="ti ${off ? 'ti-volume-off' : v < 50 ? 'ti-volume-2' : 'ti-volume'}" aria-hidden="true"></i>`;
+  $('mute-btn').setAttribute('aria-pressed', sound.muted);
+  $('mute-btn').setAttribute('aria-label', sound.muted ? t.muteOff : t.muteOn);
+  $('mute-btn').title = $('mute-btn').getAttribute('aria-label');
+  $('vol').value = v;
+  $('vol').setAttribute('aria-label', t.volume(v));
+  $('vol').title = t.volume(v);
+  $('hero-play-label').textContent = t.heroPlay(videoMinutes());
+}
+const saveSound = () => { try { localStorage.setItem('sound', JSON.stringify(sound)); } catch (e) {} };
+$('voice-btn').onclick = () => {
+  sound.voice = !sound.voice; saveSound(); renderSound();
+  if (!sound.voice) voice.stop(); // el subtítulo sigue con su tiempo de lectura
+};
+const applyVolume = () => { voice.setVolume(); music.setVolume(); };
+$('mute-btn').onclick = () => {
+  sound.muted = !sound.muted;
+  if (!sound.muted && sound.volume === 0) sound.volume = 0.8;
+  saveSound(); renderSound(); applyVolume();
+};
+$('vol').oninput = () => {
+  sound.volume = $('vol').value / 100;
+  sound.muted = false; // mover el volumen quita el silencio
+  renderSound(); applyVolume();
+};
+$('vol').onchange = saveSound;
+$('music-btn').onclick = () => {
+  sound.music = !sound.music; saveSound(); renderSound();
+  if (sound.music && playing) music.start(); else if (!sound.music) music.stop();
+};
 
 /* ---------- Pantalla completa ---------- */
 const stage = $('stage');
@@ -1240,17 +1486,18 @@ function applyLang(next, save) {
   document.querySelectorAll('[data-i18n]').forEach(el => { const v = t.ui[el.dataset.i18n]; if (v != null) el.innerHTML = v; });
   document.querySelectorAll('[data-i18n-aria]').forEach(el => { const v = t.ui[el.dataset.i18nAria]; if (v != null) el.setAttribute('aria-label', v); });
   $('stage').setAttribute('aria-roledescription', t.stageRole);
-  document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang));
+  document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed',
+    b.dataset.lang === lang && (!b.dataset.voice || b.dataset.voice === voiceEs)));
   [...progress.children].forEach((b, k) => b.setAttribute('aria-label', t.stepAria(k + 1, t.steps[k].title)));
-  renderTable(); renderPlay(); renderRecap();
+  renderTable(); renderPlay(); renderRecap(); renderSound();
   supify(document.body);
-  const m = videoMinutes();
-  $('hero-play-label').textContent = t.heroPlay(m);
 }
 document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
-  if (b.dataset.lang === lang) return;
+  const sameLang = b.dataset.lang === lang;
+  if (sameLang && (!b.dataset.voice || b.dataset.voice === voiceEs)) return;
+  if (b.dataset.voice) { voiceEs = b.dataset.voice; try { localStorage.setItem('voiceEs', voiceEs); } catch (e) {} }
   applyLang(b.dataset.lang, true);
-  lockHeights(); setHash();
+  if (!sameLang) { lockHeights(); setHash(); }
 });
 
 /* ---------- Inicio ---------- */
