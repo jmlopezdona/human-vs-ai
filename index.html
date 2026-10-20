@@ -1426,10 +1426,12 @@ const music = (() => {
   const CHORDS = [[0, 7, 14, 15, 19], [-4, 3, 12, 15, 19], [3, 10, 14, 19, 22], [-2, 5, 14, 17, 21]];
   const SPARK = [24, 27, 29, 31, 34, 36, 39]; // pentatónica de La menor, dos octavas arriba
   const hz = st => 110 * Math.pow(2, st / 12);
-  let ctx = null, out, duckGain, volGain, wet, dry, next = 0, chord = 0, sparkAt = 0, timer = 0, on = false, ducked = false;
+  let ctx = null, out, duckGain, volGain, wet, dry, sends = {}, next = 0, chord = 0, sparkAt = 0, timer = 0, on = false, ducked = false;
 
   function setup() {
-    ctx = new AC();
+    // «playback»: búferes más grandes; a la música no le importa la latencia y
+    // así el hilo de audio no se queda corto (los cortos suenan a chasquidos)
+    try { ctx = new AC({latencyHint: 'playback'}); } catch (e) { ctx = new AC(); }
     out = ctx.createGain(); out.gain.value = 0;
     duckGain = ctx.createGain(); duckGain.gain.value = 1;
     const comp = ctx.createDynamicsCompressor();
@@ -1442,17 +1444,42 @@ const music = (() => {
     wet = ctx.createGain(); wet.gain.value = 0.55; wet.connect(rev).connect(out);
     dry = ctx.createGain(); dry.gain.value = 0.45; dry.connect(out);
   }
+  // Ganancia del paso bajo de Web Audio (Q 0,3 dB) a una frecuencia, con la
+  // fórmula de la especificación: lo que el filtro le haría a un seno
+  const lp = {};
+  function lowpassAt(freq, cutoff) {
+    const key = freq.toFixed(2) + '|' + cutoff;
+    if (!(key in lp)) {
+      const w0 = 2 * Math.PI * cutoff / ctx.sampleRate, al = Math.sin(w0) / (2 * Math.pow(10, 0.3 / 20)), c = Math.cos(w0);
+      const b0 = (1 - c) / 2, b1 = 1 - c, a0 = 1 + al, a1 = -2 * c, a2 = 1 - al;
+      const w = 2 * Math.PI * freq / ctx.sampleRate, z1 = [Math.cos(w), -Math.sin(w)], z2 = [Math.cos(2 * w), -Math.sin(2 * w)];
+      const num = [b0 + b1 * z1[0] + b0 * z2[0], b1 * z1[1] + b0 * z2[1]], den = [a0 + a1 * z1[0] + a2 * z2[0], a1 * z1[1] + a2 * z2[1]];
+      lp[key] = Math.hypot(...num) / Math.hypot(...den);
+    }
+    return lp[key];
+  }
+  // Un par de envíos (reverberación y directo) por cada nivel, compartido por todas las notas
+  function sendFor(send) {
+    if (!sends[send]) {
+      const sw = ctx.createGain(); sw.gain.value = send; sw.connect(wet);
+      const sd = ctx.createGain(); sd.gain.value = 1 - send; sd.connect(dry);
+      const bus = ctx.createGain(); bus.connect(sw); bus.connect(sd);
+      sends[send] = bus;
+    }
+    return sends[send];
+  }
   function tone(freq, t, dur, {type = 'sine', peak = 0.05, attack = 2.5, release = 3, cutoff = 1400, send = 0.6, detune = 0} = {}) {
-    const o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+    // Un seno no tiene armónicos que filtrar: en vez del filtro, su ganancia a esa frecuencia
+    if (type === 'sine') peak *= lowpassAt(freq * Math.pow(2, detune / 1200), cutoff);
+    const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = type; o.frequency.value = freq; o.detune.value = detune;
-    f.type = 'lowpass'; f.frequency.value = cutoff; f.Q.value = 0.3;
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(peak, t + attack);
     g.gain.setValueAtTime(peak, t + dur);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur + release);
-    o.connect(f).connect(g);
-    const sw = ctx.createGain(); sw.gain.value = send; g.connect(sw).connect(wet);
-    const sd = ctx.createGain(); sd.gain.value = 1 - send; g.connect(sd).connect(dry);
+    if (type === 'sine') o.connect(g);
+    else { const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = cutoff; f.Q.value = 0.3; o.connect(f).connect(g); }
+    g.connect(sendFor(send));
     o.start(t); o.stop(t + dur + release + 0.1);
   }
   function schedule() {
@@ -1468,11 +1495,19 @@ const music = (() => {
     }
     while (sparkAt < ahead) {
       const st = SPARK[Math.floor(Math.random() * SPARK.length)];
-      tone(hz(st), sparkAt, 0.05, {peak: 0.12, attack: 0.01, release: 2.2, cutoff: 5000, send: 0.8});
+      tone(hz(st), sparkAt, 0.05, {peak: 0.12, attack: 0.025, release: 2.2, cutoff: 5000, send: 0.8});
       sparkAt += 1.6 + Math.random() * 3.2;
     }
   }
   const level = () => (ducked ? DUCKED : LEVEL);
+  // Lleva el volumen hacia «to» en unos «secs» segundos. setTargetAtTime parte
+  // siempre del valor real y no corta nada en curso: cancelar una rampa a
+  // medias, o leer gain.value en ella, hacía saltar el volumen (un chasquido).
+  function rampOut(to, secs) {
+    const t = ctx.currentTime;
+    out.gain.cancelScheduledValues(t);
+    out.gain.setTargetAtTime(to, t, secs / 3);
+  }
   return {
     start() {
       if (!sound.music || !AC) return;
@@ -1480,27 +1515,22 @@ const music = (() => {
       ctx.resume();
       const t = ctx.currentTime;
       if (!on) { on = true; next = Math.max(next, t + 0.1); sparkAt = Math.max(sparkAt, t + 2); }
-      out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t);
-      out.gain.linearRampToValueAtTime(level(), t + 3);
+      rampOut(level(), 3);
       clearInterval(timer); schedule(); timer = setInterval(schedule, 500);
     },
     stop() {
       if (!ctx || !on) return;
       on = false;
-      const t = ctx.currentTime;
-      out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t);
-      out.gain.linearRampToValueAtTime(0, t + 1.5);
+      rampOut(0, 1.5);
       clearInterval(timer);
       // Las notas ya programadas se dejan sonar bajo el fundido; luego se suspende
-      setTimeout(() => { if (!on) ctx.suspend(); }, 1700);
+      setTimeout(() => { if (!on) ctx.suspend(); }, 2500);
     },
     setVolume() { if (ctx) volGain.gain.setTargetAtTime(gain(), ctx.currentTime, 0.05); },
     duck(v) {
       ducked = v;
       if (!ctx || !on) return;
-      const t = ctx.currentTime;
-      out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(out.gain.value, t);
-      out.gain.linearRampToValueAtTime(level(), t + (v ? 0.4 : 1.2));
+      rampOut(level(), v ? 0.4 : 1.2);
     }
   };
 })();
