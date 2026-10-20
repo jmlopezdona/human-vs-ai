@@ -27,13 +27,24 @@ SSH, Windows no deja recorrer los enlaces simbólicos de la caché de Hugging
 Face (WinError 448): `enlazar.py` deja una copia de la instantánea de Qwen3-TTS
 con enlaces duros, en la misma unidad.
 
-Las frases de «Con cuidado» llevan un tercer campo, el aviso («¡Cuidado!»,
-«Careful!»): se dice en una toma aparte, con un vector de emoción, y va delante
-del resto de la frase con 400 ms de pausa.
+Algunas entradas llevan un tercer campo, que se dice en una toma aparte y va
+delante del texto con una pausa:
 
-El guion (`guion.json`) es el texto de cada subtítulo escrito para decirlo: las
-cifras en palabras («diez elevado a ochenta») y sin lo que solo tiene sentido
-leyendo («Prueba a mover el control»). Si cambia un texto de la página, hay que
+- En el primer subtítulo de cada paso, **el título** del paso (600 ms), para
+  que quien escucha siga el hilo de un paso a otro.
+- En «Con cuidado», **el aviso** («¡Cuidado!», «Careful!»; 400 ms).
+
+Van sin vector de emoción (el candidato `sin-1`, elegido de oído): con un
+vector, la voz dejaba de parecerse a la del narrador. Las tomas que salieron mal
+con la semilla de siempre tienen la suya apuntada en `semillas` de `POR_VOZ`.
+
+En el texto en español, los nombres ingleses van escritos como suenan («Golden
+Gueit», «Clod tres Sónet», «Jáiku»), para que el modelo no los lea a la
+española.
+
+El guion (`guion.json`) es el texto de cada subtítulo escrito para decirlo:
+dice todo lo que se ve, pero con las cifras y las fórmulas en palabras («diez
+elevado a ochenta») y las siglas desarrolladas («IA», «LLM»). Si cambia un texto de la página, hay que
 cambiar aquí su frase y volver a generarla.
 
 La licencia de las locuciones está en [`../audio/NOTICE.md`](../audio/NOTICE.md).

@@ -84,7 +84,8 @@ html{overflow-x:clip}
 .progress button:hover{background:var(--tx-3)}
 /* Cuenta atrás del modo automático: el paso actual se va rellenando */
 .progress button.timing{background:var(--line-strong)}
-.progress button.timing::after{content:"";position:absolute;inset:0;background:var(--tx);transform-origin:left;animation:fill var(--dur,5s) linear forwards}
+.progress button.timing::after{content:"";position:absolute;inset:0;background:var(--tx);transform-origin:left;animation:fill var(--dur,5s) linear var(--delay,0s) forwards}
+.progress button.timing.paused::after{animation-play-state:paused}
 @keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
 /* Pantalla completa (modo vídeo). .fs es el respaldo cuando el navegador no
@@ -360,7 +361,7 @@ footer a{color:var(--tx-2)}
     <!-- Vista 3: conclusión -->
     <div class="view" id="v-outro" hidden>
       <div class="takeaways">
-        <div class="take"><i class="ti ti-scale" aria-hidden="true" style="color:var(--hu)"></i><h3 data-i18n="take1h">Escalas parecidas</h3><p data-i18n="take1p">Humano e IA se mueven entre 4 y 15 ceros. En vocabulario y conceptos la IA va un cero por delante; en conexiones físicas, el cerebro le saca tres.</p></div>
+        <div class="take"><i class="ti ti-scale" aria-hidden="true" style="color:var(--hu)"></i><h3 data-i18n="take1h">Escalas parecidas</h3><p data-i18n="take1p">Humano e IA se mueven entre 4 y 15 ceros. En vocabulario la IA va un cero por delante y en conceptos, al menos dos; en conexiones físicas, el cerebro le saca tres. Pero la IA avanza cada año y el humano, casi nada.</p></div>
         <div class="take"><i class="ti ti-infinity" aria-hidden="true" style="color:var(--uni)"></i><h3 data-i18n="take2h">Un espacio inmenso</h3><p data-i18n="take2p">El espacio en el que trabaja un LLM tiene decenas de miles de ceros: deja pequeño incluso al número de átomos del universo (80 ceros).</p></div>
         <div class="take"><i class="ti ti-school" aria-hidden="true" style="color:var(--ia)"></i><h3 data-i18n="take3h">Lo que cuenta es aprender</h3><p data-i18n="take3p">Casi todo ese espacio es ruido sin significado. Lo que el modelo aprovecha de verdad depende del entrenamiento, no del tamaño del espacio.</p></div>
       </div>
@@ -425,7 +426,7 @@ footer a{color:var(--tx-2)}
     <ul class="warn-list">
       <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w1">Los puntos representan ceros: es una escala logarítmica. Un punto más no es «un poco más», es <strong>diez veces más</strong>.</span></li>
       <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w2">En el alejamiento, cada referencia ocupa los primeros puntos hasta su número de ceros: todas empiezan en la esquina y se solapan. Por eso cada bola lleva un anillo por cada referencia que la cuenta. No es una suma de cantidades.</span></li>
-      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w3">«Conceptos de una persona» y «rasgos de un LLM» no miden exactamente lo mismo; la comparación es orientativa.</span></li>
+      <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w3">«Conceptos de una persona» y «rasgos de un LLM» no miden exactamente lo mismo; la comparación es orientativa. El número de rasgos depende del tamaño del diccionario que se entrena: es un mínimo, no un recuento.</span></li>
       <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w4">Una sinapsis no equivale a un parámetro: una sinapsis es una pieza biológica con dinámica propia; un parámetro es un número.</span></li>
       <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w5">La capacidad de conceptos (direcciones casi independientes) depende mucho de la tolerancia elegida: cuánto se permite que dos conceptos se «mezclen».</span></li>
       <li><i class="ti ti-alert-triangle" aria-hidden="true"></i><span data-i18n="w6">Que una lista de 12.288 números pueda tomar muchísimos valores no significa que todos sean útiles: casi todas esas combinaciones son ruido sin significado.</span></li>
@@ -439,8 +440,10 @@ footer a{color:var(--tx-2)}
       <li data-i18n="s1">Caras: Jenkins, Dowsett y Burton (2018). <a href="https://doi.org/10.1098/rspb.2018.1319">How many faces do people know?</a> <em>Proc. R. Soc. B</em>.</li>
       <li data-i18n="s2">Palabras: Brysbaert et al. (2016). <a href="https://doi.org/10.3389/fpsyg.2016.01116">How many words do we know?</a> <em>Frontiers in Psychology</em>.</li>
       <li data-i18n="s3">Vocabulario de tokens: tokenizador <code>cl100k_base</code>, ~100.000 tokens. <a href="https://github.com/openai/tiktoken">openai/tiktoken</a>.</li>
-      <li data-i18n="s4">Conceptos de una persona (10⁵–10⁶): estimación orientativa, sin fuente consolidada.</li>
-      <li data-i18n="s5">Rasgos en un LLM: Templeton et al. (2024). <a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/">Scaling Monosemanticity</a>. Anthropic.</li>
+      <li data-i18n="s4">Conceptos de una persona (~10⁵): estimación propia a partir de las palabras (fuente 2), las caras (fuente 1) y las categorías de objetos que se distinguen a simple vista, unas 30.000 como máximo (Biederman, 1987, <a href="https://doi.org/10.1037/0033-295X.94.2.115">Recognition-by-components</a>, <em>Psychological Review</em>).</li>
+      <li data-i18n="s5">Rasgos en un LLM: Templeton et al. (2024). <a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/">Scaling Monosemanticity</a> (34 millones, Claude 3 Sonnet); Ameisen et al. (2025). <a href="https://transformer-circuits.pub/2025/attribution-graphs/methods.html">Circuit Tracing</a> (30 millones, Claude 3.5 Haiku). Anthropic.</li>
+      <li data-i18n="s15">Ventanas de contexto de 2026 (1 millón de tokens de entrada y 128.000 de salida): <a href="https://developers.openai.com/api/docs/models/gpt-6-astra">GPT-6 Astra</a>, documentación de OpenAI; <a href="https://platform.claude.com/docs/models/opus-5/overview">Claude Opus 5</a>, documentación de Anthropic.</li>
+      <li data-i18n="s14">Crecimiento del cómputo de entrenamiento (unas 5 veces al año desde 2020): Epoch AI, <a href="https://epoch.ai/trends">Trends in AI</a>.</li>
       <li data-i18n="s6">Neuronas: Azevedo et al. (2009). <a href="https://doi.org/10.1002/cne.21974">Equal numbers of neuronal and nonneuronal cells…</a> <em>J. Comp. Neurol.</em></li>
       <li data-i18n="s7">Sinapsis (10¹⁴–10¹⁵) y consumo (~20 W): <a href="https://en.wikipedia.org/wiki/Human_brain">Human brain</a>, Wikipedia, y referencias allí citadas.</li>
       <li data-i18n="s8">Parámetros y dimensión 12.288: Brown et al. (2020). <a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a> (GPT-3).</li>
@@ -476,7 +479,7 @@ const bandIndex = idx => { for (let b = 0; b < BANDS.length; b++) if (idx < BAND
 const STEPS = [
   {type:'intro'},
   {type:'duel', hu:4, ia:5},
-  {type:'duel', hu:6, ia:7},
+  {type:'duel', hu:5, ia:7},
   {type:'duel', hu:15, ia:12},
   {type:'zoom', n:18},
   {type:'zoom', n:30},
@@ -486,7 +489,7 @@ const STEPS = [
   {type:'outro'}
 ];
 const EXAMPLE_ICONS = ['ti-user','ti-hand-stop','ti-hourglass','ti-mood-smile','ti-book','ti-puzzle','ti-clock','ti-bulb','ti-users','ti-world'];
-const ROWS = [['hu',3],['hu',4],['ia',5],['hu',6],['ia',7],['hu',11],['uni',11],['ia',12],['hu',15],['uni',18],['teo',30],['uni',80],['teo',59185],['teo',1000000]];
+const ROWS = [['hu',3],['hu',4],['ia',5],['hu',5],['ia',7],['hu',11],['uni',11],['ia',12],['hu',15],['uni',18],['teo',30],['uni',80],['teo',59185],['teo',1000000]];
 
 /* ---------- Textos ---------- */
 const plural = (n, one, many) => n === 1 ? one : many;
@@ -499,7 +502,7 @@ const T = {
     ui: {}, // se rellena con el texto en español del propio HTML
     stageRole: 'presentación',
     next: 'Siguiente', restart: 'Volver a empezar',
-    play: 'Ver como vídeo', playShort: 'Vídeo', pause: 'Pausa',
+    play: 'Ver como vídeo', playShort: 'Vídeo', pause: 'Pausa', resume: 'Continuar', resumeAria: 'Continuar el vídeo',
     heroPlay: m => `Ver el viaje · ${m} min`, playAria: 'Reproducir a pantalla completa, como un vídeo', pauseAria: 'Pausar',
     voiceOn: 'Quitar la voz del narrador', voiceOff: 'Poner la voz del narrador',
     musicOn: 'Quitar la música', musicOff: 'Poner la música',
@@ -526,8 +529,8 @@ const T = {
       ['Caras que reconoce una persona','~5.000'],
       ['Palabras que conoce un adulto','20.000–40.000'],
       ['Vocabulario de tokens de un LLM','~100.000'],
-      ['Conceptos de una persona','10⁵–10⁶'],
-      ['Rasgos internos hallados en un LLM','~10⁷'],
+      ['Conceptos de una persona','~10⁵','Estimación generosa: unas 42.000 palabras, 5.000 caras y 30.000 categorías de objetos. Con 10⁶ ya se estira mucho.'],
+      ['Rasgos internos hallados en un LLM','≥10⁷','Mínimo: 34 millones en Claude 3 Sonnet (2024) y 30 millones en Claude 3.5 Haiku (2025). Cuantos más se buscan, más aparecen.'],
       ['Neuronas del cerebro','~8,6 × 10¹⁰'],
       ['Estrellas de la Vía Láctea','1–4 × 10¹¹'],
       ['Parámetros de un LLM grande','10¹¹–10¹²'],
@@ -549,10 +552,10 @@ const T = {
        idea:'Un LLM no lee palabras enteras sino tokens: palabras frecuentes completas y trozos para las raras. Con unas 100.000 piezas puede escribir cualquier palabra en cualquier idioma.',
        warn:'Un token no es una palabra: «inconstitucional» puede ser tres tokens. Comparar vocabularios es orientativo.'},
       {phase:'Fase 1 · Cara a cara', title:'Conceptos',
-       hu:['Conceptos que maneja una persona','10⁵–10⁶'], ia:['Rasgos internos hallados en un LLM','~10⁷'],
-       caption:'De nuevo un solo cero de diferencia: la IA representa unas diez veces más conceptos, porque ha leído muchísimo más.',
-       idea:'Con técnicas de interpretabilidad (sparse autoencoders) se han encontrado millones de «rasgos» dentro de un modelo: direcciones que se activan con ideas concretas, como «el Golden Gate» o «código con errores».',
-       warn:'La cifra humana es una estimación generosa sin fuente consolidada, y la de la IA es un límite inferior. Miden cosas parecidas, no idénticas.'},
+       hu:['Conceptos que maneja una persona','~10⁵'], ia:['Rasgos internos hallados en un LLM','≥10⁷'],
+       caption:'Aquí la IA va al menos dos ceros por delante: representa unas cien veces más conceptos, porque ha leído muchísimo más. Y la distancia crece: el cómputo con que se entrenan los modelos punteros se multiplica por cinco cada año, mientras que tu vocabulario, lo más fácil de medir de lo que sabes, crece solo unas 6.000 palabras entre los 20 y los 60 años.',
+       idea:'Con técnicas de interpretabilidad (sparse autoencoders) se han encontrado hasta 34 millones de «rasgos» en Claude 3 Sonnet (2024) y 30 millones en Claude 3.5 Haiku (2025): direcciones que se activan con ideas concretas, como «el Golden Gate» o «código con errores». De los modelos de 2026 no se han publicado cifras.',
+       warn:'La cifra humana es generosa y la de la IA es un mínimo: el número de rasgos lo fija el tamaño del diccionario que se entrena, y cuanto mayor es, más aparecen. Además, un rasgo no es exactamente un concepto humano, y no hay datos de cuántos conceptos gana una persona con la edad: solo de su vocabulario.'},
       {phase:'Fase 1 · Cara a cara', title:'El hardware',
        hu:['Sinapsis del cerebro','10¹⁴–10¹⁵'], ia:['Parámetros de un LLM grande','10¹¹–10¹²'],
        caption:'Aquí gana el humano: tus conexiones tienen tres ceros más (unas mil veces más) y funcionan con unos 20 vatios, lo que una bombilla.',
@@ -566,7 +569,7 @@ const T = {
       {phase:'Fase 2 · Alejamiento', title:'¿Cuántos conceptos podría llegar a guardar la IA?',
        label:'Capacidad: conceptos que cabrían en una lista de 12.288 números sin apenas mezclarse (10²⁰–10³⁰)',
        caption:'Cada palabra es una lista de 12.288 números, y cada concepto, una «dirección» en ella. Caben unas 10³⁰ sin apenas mezclarse. Es capacidad, no conocimiento: lo encontrado de verdad son unos 10⁷ (paso «Conceptos»).',
-       idea:'En una habitación solo puedes poner 3 flechas totalmente perpendiculares: largo, ancho y alto. Pero si aceptas que estén «casi» perpendiculares, en un espacio de miles de dimensiones caben cantidades astronómicas. Esto es lo que permite la superposición.',
+       idea:'En una habitación solo puedes poner 3 flechas totalmente perpendiculares: largo, ancho y alto. Cada concepto tiene que ser una flecha que el modelo pueda leer sin confundirla con las demás; por eso en una sola dimensión, aunque quepan infinitos valores, solo cabe una dirección. Pero si aceptas flechas «casi» perpendiculares, que se mezclen muy poco, en un espacio de miles de dimensiones caben cantidades astronómicas. Esto es lo que permite la superposición.',
        warn:'La cifra depende muchísimo de la tolerancia elegida: entre 20 y 30 ceros según cuánto permitamos que interfieran.'},
       {phase:'Fase 2 · Alejamiento', title:'Comparado con los átomos del universo',
        label:'Átomos del universo observable (~10⁸⁰)',
@@ -578,10 +581,10 @@ const T = {
        caption:'Cada palabra es una lista de 12.288 números (un «vector»). Contando todas las listas posibles salen 59.185 ceros: humano, IA y universo quedan en una mancha de la esquina, que amplía la lupa.',
        idea:'Cada número de la lista ocupa 16 bits, así que la lista entera son 196.608 bits: 2¹⁹⁶·⁶⁰⁸ combinaciones posibles, unos 10⁵⁹·¹⁸⁵. Es como un candado con 12.288 ruedas de 65.536 posiciones cada una.',
        warn:'Casi todas esas combinaciones son ruido sin significado. Que existan no quiere decir que el modelo las use.'},
-      {phase:'Fase 2 · Alejamiento', title:'¿Cuántos textos distintos podría escribir la IA?',
+      {phase:'Fase 2 · Alejamiento', title:'¿Cuántos textos distintos podría llegar a escribir la IA?',
        label:'Textos posibles de 200.000 tokens con un vocabulario de 100.000',
        caption:'Un millón de ceros, un punto por píxel. Todo lo anterior cabe en la esquina que amplía la lupa; el recuadro son las formas de guardar una palabra del paso anterior.',
-       idea:'Con 100.000 tokens posibles en cada una de las 200.000 posiciones, hay 100.000²⁰⁰·⁰⁰⁰ = 10¹·⁰⁰⁰·⁰⁰⁰ textos distintos. Escrito entero, este número ocuparía cientos de páginas.',
+       idea:'Con 100.000 tokens posibles en cada una de las 200.000 posiciones, hay 100.000²⁰⁰·⁰⁰⁰ = 10¹·⁰⁰⁰·⁰⁰⁰ textos distintos. Escrito entero, este número ocuparía cientos de páginas. La cifra crece con la longitud: cada token suma cinco ceros. Los modelos de 2026 leen hasta un millón de tokens de una vez (5 millones de ceros de textos posibles), pero lo que escriben en una respuesta tiene un tope de unos 128.000 tokens (unos 640.000 ceros).',
        warn:'La inmensa mayoría de esos textos son galimatías. El entrenamiento enseña al modelo a moverse solo por la diminuta región que tiene sentido.'},
       {phase:'Final', title:'Qué nos llevamos',
        caption:'Humano e IA son comparables en escala. Lo que es verdaderamente inmenso es el espacio en el que trabaja el modelo, y lo que lo hace útil es el aprendizaje.',
@@ -596,7 +599,7 @@ const T = {
     hashWord: 'step',
     stageRole: 'slideshow',
     next: 'Next', restart: 'Start over',
-    play: 'Watch as video', playShort: 'Video', pause: 'Pause',
+    play: 'Watch as video', playShort: 'Video', pause: 'Pause', resume: 'Resume', resumeAria: 'Resume the video',
     heroPlay: m => `Watch the journey · ${m} min`, playAria: 'Play full screen, like a video', pauseAria: 'Pause',
     voiceOn: 'Mute the narrator', voiceOff: 'Unmute the narrator',
     musicOn: 'Mute the music', musicOff: 'Unmute the music',
@@ -623,8 +626,8 @@ const T = {
       ['Faces a person recognizes','~5,000'],
       ['Words an adult knows','20,000–40,000'],
       ['Token vocabulary of an LLM','~100,000'],
-      ['Concepts a person holds','10⁵–10⁶'],
-      ['Internal features found in an LLM','~10⁷'],
+      ['Concepts a person holds','~10⁵','A generous estimate: about 42,000 words, 5,000 faces and 30,000 object categories. 10⁶ is already a stretch.'],
+      ['Internal features found in an LLM','≥10⁷','A lower bound: 34 million in Claude 3 Sonnet (2024) and 30 million in Claude 3.5 Haiku (2025). The harder you look, the more you find.'],
       ['Neurons in the brain','~8.6 × 10¹⁰'],
       ['Stars in the Milky Way','1–4 × 10¹¹'],
       ['Parameters of a large LLM','10¹¹–10¹²'],
@@ -646,10 +649,10 @@ const T = {
        idea:'An LLM does not read whole words but tokens: common words in full and fragments for rare ones. With about 100,000 pieces it can spell any word in any language.',
        warn:'A token is not a word: “unconstitutional” can be three tokens. Comparing vocabularies is only a rough guide.'},
       {phase:'Phase 1 · Head to head', title:'Concepts',
-       hu:['Concepts a person holds','10⁵–10⁶'], ia:['Internal features found in an LLM','~10⁷'],
-       caption:'Again just one zero apart: the AI represents about ten times more concepts, because it has read vastly more.',
-       idea:'Using interpretability techniques (sparse autoencoders), researchers have found millions of “features” inside a model: directions that light up for specific ideas, such as “the Golden Gate Bridge” or “buggy code”.',
-       warn:'The human figure is a generous estimate with no established source, and the AI figure is a lower bound. They measure similar things, not identical ones.'},
+       hu:['Concepts a person holds','~10⁵'], ia:['Internal features found in an LLM','≥10⁷'],
+       caption:'Here the AI is at least two zeros ahead: it represents about a hundred times more concepts, because it has read vastly more. And the gap keeps growing: the compute used to train frontier models grows about fivefold every year, while your vocabulary, the easiest part of what you know to measure, grows by only about 6,000 words between the ages of 20 and 60.',
+       idea:'Using interpretability techniques (sparse autoencoders), researchers have found up to 34 million “features” in Claude 3 Sonnet (2024) and 30 million in Claude 3.5 Haiku (2025): directions that light up for specific ideas, such as “the Golden Gate Bridge” or “buggy code”. No figures have been published for 2026 models.',
+       warn:'The human figure is generous and the AI figure is a lower bound: the number of features is set by the size of the dictionary being trained, and the bigger it is, the more turn up. Also, a feature is not exactly a human concept, and there is no data on how many concepts a person gains with age, only on vocabulary.'},
       {phase:'Phase 1 · Head to head', title:'The hardware',
        hu:['Synapses in the brain','10¹⁴–10¹⁵'], ia:['Parameters of a large LLM','10¹¹–10¹²'],
        caption:'Here the human wins: your connections have three more zeros (about a thousand times more) and run on roughly 20 watts, like a light bulb.',
@@ -663,7 +666,7 @@ const T = {
       {phase:'Phase 2 · Zooming out', title:'How many concepts could an AI hold?',
        label:'Capacity: concepts that would fit in a list of 12,288 numbers with barely any overlap (10²⁰–10³⁰)',
        caption:'Each word is a list of 12,288 numbers, and each concept a “direction” within it. About 10³⁰ fit with barely any overlap. That is capacity, not knowledge: what has actually been found is about 10⁷ (the “Concepts” step).',
-       idea:'In a room you can only place 3 fully perpendicular arrows: length, width and height. But if you accept “almost” perpendicular, a space with thousands of dimensions holds astronomical numbers of them. This is what makes superposition possible.',
+       idea:'In a room you can only place 3 fully perpendicular arrows: length, width and height. Each concept has to be an arrow the model can read without confusing it with the others; that is why a single dimension, even though it holds infinitely many values, has room for just one direction. But if you accept “almost” perpendicular arrows, which barely mix, a space with thousands of dimensions holds astronomical numbers of them. This is what makes superposition possible.',
        warn:'The figure depends heavily on the chosen tolerance: between 20 and 30 zeros depending on how much interference we allow.'},
       {phase:'Phase 2 · Zooming out', title:'Compared with the atoms in the universe',
        label:'Atoms in the observable universe (~10⁸⁰)',
@@ -678,7 +681,7 @@ const T = {
       {phase:'Phase 2 · Zooming out', title:'How many different texts could an AI write?',
        label:'Possible texts of 200,000 tokens with a 100,000-token vocabulary',
        caption:'A million zeros, one dot per pixel. Everything so far fits in the corner the magnifier enlarges; the framed square is the ways to store a word from the previous step.',
-       idea:'With 100,000 possible tokens in each of 200,000 positions, there are 100,000²⁰⁰ ⁰⁰⁰ = 10¹ ⁰⁰⁰ ⁰⁰⁰ different texts. Written out, this number would fill hundreds of pages.',
+       idea:'With 100,000 possible tokens in each of 200,000 positions, there are 100,000²⁰⁰ ⁰⁰⁰ = 10¹ ⁰⁰⁰ ⁰⁰⁰ different texts. Written out, this number would fill hundreds of pages. The figure grows with length: each token adds five zeros. 2026 models read up to a million tokens at once (5 million zeros of possible texts), but what they write in one reply is capped at about 128,000 tokens (about 640,000 zeros).',
        warn:'The vast majority of those texts are gibberish. Training teaches the model to move only through the tiny region that makes sense.'},
       {phase:'The end', title:'Key takeaways',
        caption:'Humans and AI are comparable in scale. What is truly immense is the space the model works in, and what makes it useful is learning.',
@@ -696,7 +699,7 @@ const T = {
       dragHint: 'Drag to add zeros', range0: '0 zeros', range9: '9 zeros',
       recapH: 'The journey in zeros · tap a figure to revisit that step',
       human: 'Human', ai: 'AI (language model)', zerosWord: 'zeros', zerosOnScreen: 'zeros on screen',
-      take1h: 'Similar scales', take1p: 'Humans and AI both sit between 4 and 15 zeros. In vocabulary and concepts the AI is one zero ahead; in physical connections, the brain is three ahead.',
+      take1h: 'Similar scales', take1p: 'Humans and AI both sit between 4 and 15 zeros. In vocabulary the AI is one zero ahead and in concepts at least two; in physical connections, the brain is three ahead. But the AI moves forward every year, and the human barely at all.',
       take2h: 'An immense space', take2p: 'The space an LLM works in has tens of thousands of zeros: it dwarfs even the number of atoms in the universe (80 zeros).',
       take3h: 'Learning is what counts', take3p: 'Almost all of that space is meaningless noise. What the model actually makes use of depends on training, not on the size of the space.',
       more: 'Dig deeper', idea: 'The idea', careful: 'Careful',
@@ -714,7 +717,7 @@ const T = {
       rigorH: 'Caveats', rigorSub: 'Comparing brains and models helps build intuition, but it has pitfalls.',
       w1: 'The dots stand for zeros: it is a logarithmic scale. One more dot is not “a bit more”, it is <strong>ten times more</strong>.',
       w2: 'When zooming out, each reference fills the first dots up to its number of zeros: they all start in the corner and overlap. That is why each dot gets one ring per reference that counts it. It is not a sum of quantities.',
-      w3: '“Concepts a person holds” and “features in an LLM” do not measure exactly the same thing; the comparison is only a rough guide.',
+      w3: '“Concepts a person holds” and “features in an LLM” do not measure exactly the same thing; the comparison is only a rough guide. The number of features depends on the size of the dictionary being trained: it is a lower bound, not a count.',
       w4: 'A synapse is not the same as a parameter: a synapse is a biological component with its own dynamics; a parameter is a number.',
       w5: 'The concept capacity (nearly independent directions) depends heavily on the chosen tolerance: how much two concepts are allowed to “mix”.',
       w6: 'The fact that a list of 12,288 numbers can take a huge number of values does not make them all useful: almost all of those combinations are meaningless noise.',
@@ -722,8 +725,10 @@ const T = {
       s1: 'Faces: Jenkins, Dowsett and Burton (2018). <a href="https://doi.org/10.1098/rspb.2018.1319">How many faces do people know?</a> <em>Proc. R. Soc. B</em>.',
       s2: 'Words: Brysbaert et al. (2016). <a href="https://doi.org/10.3389/fpsyg.2016.01116">How many words do we know?</a> <em>Frontiers in Psychology</em>.',
       s3: 'Token vocabulary: the <code>cl100k_base</code> tokenizer, ~100,000 tokens. <a href="https://github.com/openai/tiktoken">openai/tiktoken</a>.',
-      s4: 'Concepts a person holds (10⁵–10⁶): rough estimate, no established source.',
-      s5: 'Features in an LLM: Templeton et al. (2024). <a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/">Scaling Monosemanticity</a>. Anthropic.',
+      s4: 'Concepts a person holds (~10⁵): our own estimate from words (source 2), faces (source 1) and the object categories we can tell apart at a glance, about 30,000 at most (Biederman, 1987, <a href="https://doi.org/10.1037/0033-295X.94.2.115">Recognition-by-components</a>, <em>Psychological Review</em>).',
+      s5: 'Features in an LLM: Templeton et al. (2024). <a href="https://transformer-circuits.pub/2024/scaling-monosemanticity/">Scaling Monosemanticity</a> (34 million, Claude 3 Sonnet); Ameisen et al. (2025). <a href="https://transformer-circuits.pub/2025/attribution-graphs/methods.html">Circuit Tracing</a> (30 million, Claude 3.5 Haiku). Anthropic.',
+      s15: '2026 context windows (1 million input tokens and 128,000 output tokens): <a href="https://developers.openai.com/api/docs/models/gpt-6-astra">GPT-6 Astra</a>, OpenAI documentation; <a href="https://platform.claude.com/docs/models/opus-5/overview">Claude Opus 5</a>, Anthropic documentation.',
+      s14: 'Growth in training compute (about 5x per year since 2020): Epoch AI, <a href="https://epoch.ai/trends">Trends in AI</a>.',
       s6: 'Neurons: Azevedo et al. (2009). <a href="https://doi.org/10.1002/cne.21974">Equal numbers of neuronal and nonneuronal cells…</a> <em>J. Comp. Neurol.</em>',
       s7: 'Synapses (10¹⁴–10¹⁵) and power use (~20 W): <a href="https://en.wikipedia.org/wiki/Human_brain">Human brain</a>, Wikipedia, and references cited there.',
       s8: 'Parameters and dimension 12,288: Brown et al. (2020). <a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a> (GPT-3).',
@@ -1024,8 +1029,9 @@ function renderZoom(st, tx) {
     `<li><button type="button" data-b="${k}"><span class="sw" style="background:var(${b.v})"></span>${t.bands[k]}<span class="rng">${t.zerosN(fmt(Math.min(b.to, n)))}</span></button></li>`).join('');
   $('legend').innerHTML = items + `<li><button type="button" data-b="-1"><span class="sw all"></span>${t.byStretch}</button></li>`;
   const syncLegend = () => $('legend').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.b === sel));
+  // Resaltar una referencia no para el modo vídeo: no cambia de paso
   $('legend').querySelectorAll('button').forEach(b => b.onclick = () => {
-    sel = +b.dataset.b; syncLegend(); stopAuto();
+    sel = +b.dataset.b; syncLegend();
     if (zoomRedraw) zoomRedraw();
   });
   syncLegend();
@@ -1064,7 +1070,7 @@ function lockHeights() {
   parts.forEach(el => el.style.minHeight = '');
   // En móvil todo va en una columna y la página se desplaza de todos modos:
   // fijar la altura del paso más alto solo dejaría huecos en los demás.
-  if (matchMedia('(max-width:760px)').matches) { go(keep.cur, true); return; }
+  if (matchMedia('(max-width:760px)').matches) { backTo(keep); return; }
   measuring = true; playing = false;
   const max = parts.map(() => 0);
   STEPS.forEach((_, k) => {
@@ -1076,7 +1082,16 @@ function lockHeights() {
   parts.forEach((el, i) => el.style.minHeight = max[i] + 'px');
   // Volver al paso en el que estábamos sin reiniciar su estado
   cur = keep.cur; sel = keep.sel; zoomSide = keep.zoomSide;
+  backTo(keep);
+}
+// Redibuja el paso; si el modo vídeo iba por un subtítulo (o está en pausa en
+// él), lo deja donde estaba en lugar de empezar el paso de nuevo
+function backTo(keep) {
+  const keepBeat = beat && beat.k === keep.cur;
+  playing = keepBeat ? false : keep.playing;
   go(keep.cur, true);
+  playing = keep.playing;
+  if (keepBeat) showBeatState();
 }
 
 /* ---------- Navegación ---------- */
@@ -1126,9 +1141,9 @@ const beatsOf = k => { const tx = L().steps[k]; return [['cap', tx.caption], ['i
 // Duración en segundos de cada locución, por voz; la escribe narracion/igualar.py.
 // El texto en español es el mismo y lo dicen dos voces: de España y de Latinoamérica.
 const VOICE_S = {
-  'es-ES': {"1-cap":9.06,"1-idea":12.29,"1-warn":7.38,"2-cap":7.99,"2-idea":11.54,"2-warn":8.54,"3-cap":9.78,"3-idea":11.94,"3-warn":10.96,"4-cap":9.82,"4-idea":9.69,"4-warn":8.03,"5-cap":12.29,"5-idea":11.26,"5-warn":9.52,"6-cap":15.49,"6-idea":15.45,"6-warn":8.79,"7-cap":8.86,"7-idea":10.62,"7-warn":7.89,"8-cap":19.0,"8-idea":18.32,"8-warn":7.85,"9-cap":10.46,"9-idea":11.18,"9-warn":9.62,"10-cap":11.98,"10-idea":9.46,"10-warn":7.02},
-  'es-419': {"1-cap":11.77,"1-idea":14.69,"1-warn":9.27,"2-cap":10.98,"2-idea":14.65,"2-warn":10.99,"3-cap":12.77,"3-idea":14.41,"3-warn":13.43,"4-cap":13.46,"4-idea":11.3,"4-warn":8.44,"5-cap":15.98,"5-idea":13.1,"5-warn":10.19,"6-cap":18.81,"6-idea":18.81,"6-warn":10.52,"7-cap":11.82,"7-idea":13.62,"7-warn":8.22,"8-cap":23.53,"8-idea":21.01,"8-warn":9.62,"9-cap":12.69,"9-idea":15.09,"9-warn":11.95,"10-cap":13.49,"10-idea":11.3,"10-warn":7.83},
-  en: {"1-cap":10.77,"1-idea":15.57,"1-warn":8.75,"2-cap":8.74,"2-idea":15.37,"2-warn":10.21,"3-cap":10.26,"3-idea":14.09,"3-warn":12.2,"4-cap":12.54,"4-idea":10.66,"4-warn":10.08,"5-cap":12.82,"5-idea":12.46,"5-warn":10.26,"6-cap":18.84,"6-idea":17.61,"6-warn":10.98,"7-cap":10.33,"7-idea":11.13,"7-warn":10.61,"8-cap":18.92,"8-idea":18.92,"8-warn":8.16,"9-cap":12.54,"9-idea":13.77,"9-warn":9.59,"10-cap":11.41,"10-idea":10.58,"10-warn":7.19}
+  'es-ES': {"1-cap":12.39,"1-idea":12.29,"1-warn":7.38,"2-cap":8.02,"2-idea":11.54,"2-warn":8.54,"3-cap":25.16,"3-idea":26.72,"3-warn":21.76,"4-cap":10.55,"4-idea":10.69,"4-warn":8.03,"5-cap":14.67,"5-idea":11.26,"5-warn":14.51,"6-cap":22.35,"6-idea":29.86,"6-warn":8.79,"7-cap":15.21,"7-idea":10.62,"7-warn":7.89,"8-cap":22.66,"8-idea":25.47,"8-warn":7.85,"9-cap":15.31,"9-idea":32.46,"9-warn":9.62,"10-cap":11.99,"10-idea":9.46,"10-warn":7.02},
+  'es-419': {"1-cap":15.98,"1-idea":14.69,"1-warn":9.27,"2-cap":8.61,"2-idea":14.65,"2-warn":10.99,"3-cap":30.03,"3-idea":31.66,"3-warn":25.95,"4-cap":13.24,"4-idea":12.74,"4-warn":8.44,"5-cap":17.9,"5-idea":13.1,"5-warn":17.06,"6-cap":27.01,"6-idea":35.02,"6-warn":10.52,"7-cap":18.12,"7-idea":13.62,"7-warn":8.22,"8-cap":26.95,"8-idea":29.63,"8-warn":9.62,"9-cap":16.9,"9-idea":40.23,"9-warn":11.95,"10-cap":12.98,"10-idea":11.3,"10-warn":7.83},
+  en: {"1-cap":15.82,"1-idea":15.57,"1-warn":8.75,"2-cap":8.68,"2-idea":15.37,"2-warn":10.21,"3-cap":26.37,"3-idea":26.24,"3-warn":24.88,"4-cap":12.8,"4-idea":11.9,"4-warn":10.08,"5-cap":16.23,"5-idea":12.46,"5-warn":15.54,"6-cap":24.55,"6-idea":34.24,"6-warn":10.98,"7-cap":18.23,"7-idea":11.13,"7-warn":10.61,"8-cap":23.05,"8-idea":26.52,"8-warn":8.16,"9-cap":17.34,"9-idea":40.29,"9-warn":9.59,"10-cap":11.71,"10-idea":10.58,"10-warn":7.19}
 };
 const voiceDir = () => (lang === 'en' ? 'en' : voiceEs);
 const voiceKey = (k, kind) => `${k + 1}-${kind}`;
@@ -1151,49 +1166,88 @@ function showBeat(kind, text) {
   supify(cap);
   cap.classList.remove('anim-in'); void cap.offsetWidth; cap.classList.add('anim-in');
 }
-const clearTiming = () => [...progress.children].forEach(b => b.classList.remove('timing'));
+const clearTiming = () => [...progress.children].forEach(b => b.classList.remove('timing', 'paused'));
 // Cada subtítulo pasa al siguiente cuando ha durado lo previsto y, además,
 // ha terminado su locución: si el audio llega tarde, no se corta.
-let beatToken = 0;
+// `beat` es el subtítulo en curso: con él, la pausa sabe por dónde seguir.
+let beatToken = 0, beat = null;
+const armBeat = (b, ms) => { clearTimeout(autoTimer); b.ends = performance.now() + ms; autoTimer = setTimeout(() => { b.fired = true; b.done(); }, ms); };
+const beatLeft = b => (b.fired ? 0 : b.left ?? Math.max(0, b.ends - performance.now()));
 function stepDone() {
-  if (!playing || measuring) return;
+  // Un redibujado (al cambiar de tamaño o volver a pantalla completa) repite la
+  // animación del paso; si ya iba por un subtítulo, no se empieza de nuevo
+  if (!playing || measuring || (beat && beat.k === cur)) return;
   clearTimeout(autoTimer); clearTiming();
   const k = cur, beats = beatsOf(k), durs = beats.map(([kind, text]) => beatMs(k, kind, text));
   const seg = progress.children[k];
-  seg.style.setProperty('--dur', durs.reduce((a, b) => a + b, 0) + 'ms'); void seg.offsetWidth; seg.classList.add('timing');
+  seg.style.setProperty('--dur', durs.reduce((a, b) => a + b, 0) + 'ms'); seg.style.setProperty('--delay', '0ms');
+  void seg.offsetWidth; seg.classList.add('timing');
   const runBeat = i => {
     if (i > 0) showBeat(...beats[i]);
     const token = ++beatToken;
     let waiting = 2;
     const done = () => { if (token === beatToken && --waiting === 0) nextBeat(i); };
-    autoTimer = setTimeout(done, durs[i]);
+    beat = {k, i, beats, durs, done, fired: false, left: null};
+    armBeat(beat, durs[i]);
     voice.say(voiceKey(k, beats[i][0])).then(done);
     if (i + 1 < beats.length) voice.preload(voiceKey(k, beats[i + 1][0]));
     else if (k + 1 < STEPS.length) voice.preload(voiceKey(k + 1, 'cap'));
   };
   const nextBeat = i => {
     if (i + 1 < beats.length) runBeat(i + 1);
-    else if (k === STEPS.length - 1) stopAuto();
-    else go(k + 1);
+    else { beat = null; if (k === STEPS.length - 1) stopAuto(); else go(k + 1); }
   };
   runBeat(0);
+}
+// Vuelve a pintar el subtítulo en curso y la barra en su punto, en marcha o
+// en pausa: lo usan la reanudación y el redibujado tras cambiar de tamaño
+function showBeatState() {
+  const {k, i, beats, durs} = beat;
+  if (i > 0) showBeat(...beats[i]);
+  const seg = progress.children[k];
+  const elapsed = durs.slice(0, i).reduce((a, b) => a + b, 0) + durs[i] - beatLeft(beat);
+  seg.style.setProperty('--dur', durs.reduce((a, b) => a + b, 0) + 'ms');
+  seg.style.setProperty('--delay', -elapsed + 'ms');
+  seg.classList.remove('timing'); void seg.offsetWidth; seg.classList.add('timing');
+  seg.classList.toggle('paused', !playing);
 }
 function renderPlay() {
   const t = L();
   $('play').innerHTML = playing
     ? `<i class="ti ti-player-pause" aria-hidden="true"></i><span>${t.pause}</span>`
-    : `<i class="ti ti-player-play-filled" aria-hidden="true"></i><span class="lbl-long">${t.play}</span><span class="lbl-short">${t.playShort}</span>`;
-  $('play').setAttribute('aria-label', playing ? t.pauseAria : t.playAria);
+    : beat
+      ? `<i class="ti ti-player-play-filled" aria-hidden="true"></i><span>${t.resume}</span>`
+      : `<i class="ti ti-player-play-filled" aria-hidden="true"></i><span class="lbl-long">${t.play}</span><span class="lbl-short">${t.playShort}</span>`;
+  $('play').setAttribute('aria-label', playing ? t.pauseAria : beat ? t.resumeAria : t.playAria);
+}
+// Pausa: se queda en el subtítulo, con su tiempo y su locución donde iban.
+// Si aún no había empezado ninguno (la animación de entrada), para del todo.
+function pauseAuto() {
+  if (!beat) { stopAuto(); return; }
+  beat.left = beatLeft(beat);
+  playing = false; clearTimeout(autoTimer); renderPlay();
+  voice.pause(); music.stop();
+  progress.children[beat.k].classList.add('paused');
 }
 function startAuto() {
+  if (beat && beat.k === cur) { resumeAuto(); return; }
+  beat = null;
   playing = true; renderPlay();
   // Dentro del clic o la tecla: el navegador solo deja sonar audio tras un gesto
   music.start(); voice.unlock(voiceKey(cur === STEPS.length - 1 ? 0 : cur, 'cap'));
   if (!isFs()) enterFs();
   go(cur === STEPS.length - 1 ? 0 : cur, true);
 }
+function resumeAuto() {
+  playing = true; renderPlay();
+  music.start(); voice.resume(); // dentro del clic, como al empezar
+  if (!beat.fired) armBeat(beat, beat.left);
+  beat.left = null;
+  showBeatState();
+  if (!isFs()) enterFs();
+}
 function stopAuto() {
-  playing = false; beatToken++; clearTimeout(autoTimer); clearTiming(); renderPlay();
+  playing = false; beatToken++; beat = null; clearTimeout(autoTimer); clearTiming(); renderPlay();
   voice.stop(); music.stop();
 }
 
@@ -1222,6 +1276,13 @@ const voice = (() => {
   el.onended = end; el.onerror = end;
   return {
     stop,
+    pause() { if (finish) el.pause(); },
+    resume() {
+      if (!finish) return;
+      music.duck(true);
+      const p = el.play();
+      if (p && p.catch) p.catch(end);
+    },
     setVolume() { el.volume = gain(); },
     // Llamar dentro del clic que arranca el vídeo
     unlock(key) {
@@ -1402,7 +1463,7 @@ function onFsChange() {
   if (on === wasFs) return;
   wasFs = on;
   stage.classList.toggle('is-fs', on);
-  if (!on && playing) stopAuto();
+  if (!on && playing) pauseAuto(); // al salir de pantalla completa se pausa, y se puede seguir
   lastW = innerWidth; lastH = innerHeight;
   lockHeights(); // vuelve a medir y dibujar con el nuevo tamaño
 }
@@ -1418,13 +1479,13 @@ $('more-btn').onclick = () => {
 
 $('next').onclick = () => { stopAuto(); go(cur + 1); };
 $('prev').onclick = () => { stopAuto(); go(cur - 1); };
-$('play').onclick = () => playing ? stopAuto() : startAuto();
+$('play').onclick = () => playing ? pauseAuto() : startAuto();
 document.addEventListener('keydown', e => {
   if (e.target.matches('input, textarea')) return;
   if (e.key === 'ArrowRight') { stopAuto(); go(cur + 1); }
   else if (e.key === 'ArrowLeft') { stopAuto(); go(cur - 1); }
   else if (e.key === 'Escape' && stage.classList.contains('fs')) exitFs();
-  else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); playing ? stopAuto() : startAuto(); }
+  else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); playing ? pauseAuto() : startAuto(); }
 });
 const fromHash = () => { const m = location.hash.match(/^#(?:paso|step)-(\d+)$/); return m ? Math.min(STEPS.length, Math.max(1, +m[1])) - 1 : null; };
 window.addEventListener('hashchange', () => { const k = fromHash(); if (k !== null && k !== cur) go(k, true); });
@@ -1496,6 +1557,7 @@ document.querySelectorAll('.lang button').forEach(b => b.onclick = () => {
   const sameLang = b.dataset.lang === lang;
   if (sameLang && (!b.dataset.voice || b.dataset.voice === voiceEs)) return;
   if (b.dataset.voice) { voiceEs = b.dataset.voice; try { localStorage.setItem('voiceEs', voiceEs); } catch (e) {} }
+  if (beat) stopAuto(); // la pausa era de otro idioma u otra voz: se empieza el paso de nuevo
   applyLang(b.dataset.lang, true);
   if (!sameLang) { lockHeights(); setHash(); }
 });

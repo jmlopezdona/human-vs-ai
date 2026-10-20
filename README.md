@@ -1,66 +1,80 @@
 # Humano vs IA, contado en ceros
 
-Visualización interactiva que compara, contando ceros, lo que maneja un ser humano, lo que maneja un modelo de lenguaje (LLM) y el espacio teórico en el que trabaja ese modelo. Cada punto es un cero: cada punto más multiplica la cifra por diez.
+¿Es una IA «más grande» que un cerebro? Depende de lo que contemos. Esta
+visualización lo compara todo con una sola regla: **cada punto es un cero**, y
+cada punto más multiplica la cifra por diez.
 
-Sitio 100 % estático (HTML, CSS y JavaScript), sin paso de compilación.
+**Verla:** https://jmlopezdona.github.io/human-vs-ai/
 
-## Estructura
+## Qué vas a ver
 
-```
-.
-├── index.html      La visualización completa (HTML, CSS y JS en un solo archivo)
-├── audio/          Locuciones del narrador del modo vídeo (es-ES/, es-419/ y en/) y su licencia
-├── narracion/      Guion hablado y guiones para generar las locuciones
-├── LICENSE         Licencia MIT del código
-├── LICENSE-CONTENT.md  Licencia CC BY 4.0 de textos e imágenes
-├── og-image.png    Imagen para compartir en redes (1200×630)
-├── README.md
-└── .nojekyll       Evita que GitHub Pages procese el sitio con Jekyll
-```
+Un viaje en diez pasos:
 
-## Qué incluye
+1. **Cómo leer los puntos:** por qué contamos ceros en lugar de cifras.
+2. **Tres comparaciones cara a cara** entre una persona y un modelo de
+   lenguaje: palabras, conceptos y hardware. En las dos primeras va por
+   delante la IA; en conexiones físicas, el cerebro.
+3. **Cinco pasos alejando la cámara:** la edad del universo, los conceptos que
+   podría llegar a guardar una IA, los átomos del universo, las formas de
+   guardar una palabra y los textos que podría escribir, hasta el millón de
+   ceros.
+4. **Un resumen** con lo que nos llevamos.
 
-- **10 pasos:** una introducción interactiva para entender la escala de ceros, tres comparaciones cara a cara (palabras, conceptos y hardware), cinco pasos de alejamiento hasta el millón de ceros y un resumen final.
-- **Alejamiento con zoom continuo:** todo lo anterior se queda fijo en la esquina. Cada bola lleva un anillo por cada referencia que cuenta ese cero, y al tocar una referencia de la leyenda se resaltan todos sus ceros. En los pasos más grandes, una lupa amplía la esquina.
-- **Modo vídeo:** a pantalla completa, con el texto de cada paso, «La idea» y «Con cuidado» como subtítulos y una cuenta atrás en la barra de progreso. Un narrador lee cada subtítulo, con voz de España o de Latinoamérica en español (ES y LATAM en el selector de idioma) o en inglés, y suena una música de fondo que baja mientras habla. La voz y la música se quitan por separado con sus botones, y hay un botón de silencio y un control de volumen para las dos (en móvil, solo el silencio). Estos controles solo aparecen a pantalla completa, y todo se recuerda. Silenciar no quita la voz: los subtítulos siguen su ritmo; sin voz, cada subtítulo dura según su longitud. La duración que muestra el botón se calcula a partir de las locuciones. Esc para salir.
-- **Narración:** la voz se diseñó con Qwen3-TTS VoiceDesign y cada frase la dice IndexTTS-2.5, con las piezas de la mesa de doblaje (ver [`narracion/`](narracion/README.md)). La música no es un fichero: se genera en el navegador con Web Audio.
-- **Navegación:** con el teclado (← → y espacio) y enlaces directos a cada paso (`#paso-3` o `#step-3`).
-- **«Para entenderlo mejor»** en cada paso, y en la página: fundamentos, tabla de magnitudes, advertencias de rigor y fuentes.
-- **Bilingüe español/inglés:** se muestra en español si el navegador está en español y en inglés en cualquier otro caso. El selector ES/LATAM/EN de la cabecera permite cambiarlo y la elección se recuerda. ES y LATAM muestran el mismo texto; cambian la voz del narrador, que por defecto es la de España si el navegador está en `es` o `es-ES` y la de Latinoamérica con cualquier otro español.
-- **Tema claro/oscuro**, diseño adaptado a móvil, textos alternativos y respeto por la opción de reducir movimiento.
+Cada paso tiene un apartado «Para entenderlo mejor», y al final de la página
+hay una explicación de los fundamentos, una tabla de magnitudes, advertencias
+y las fuentes de cada cifra.
 
-## Verlo en local
+## El modo vídeo
 
-Abre `index.html` en el navegador, o sirve la carpeta:
+Con **Ver como vídeo** (o la barra espaciadora) el viaje se reproduce solo, a
+pantalla completa, como un documental: un narrador lee cada texto y suena una
+música de fondo que baja mientras habla. Hay voz de España, de Latinoamérica y
+en inglés; se elige con el selector **ES · LATAM · EN** de la cabecera.
+
+A pantalla completa puedes quitar la voz o la música, silenciarlo todo o bajar
+el volumen. Sin voz, los textos avanzan a ritmo de lectura. Para salir, Esc.
+
+## Cómo se usa
+
+- Las flechas ← → pasan de un paso a otro, y cada paso tiene su enlace
+  (`#paso-3`).
+- Está en español y en inglés, con tema claro y oscuro, y se ve bien en el
+  móvil.
+
+Para verla en tu ordenador, abre `index.html` en el navegador o sirve la
+carpeta:
 
 ```bash
 python3 -m http.server 8000
-# http://localhost:8000
+# y abre http://localhost:8000
 ```
 
-## Publicar en GitHub Pages
+## Cómo está hecha
 
-```bash
-git init
-git add .
-git commit -m "Primera versión"
-git branch -M main
-git remote add origin https://github.com/jmlopezdona/human-vs-ai.git
-git push -u origin main
-```
+Es una página estática, sin compilar ni instalar nada: todo está en
+`index.html`. La música se genera en el propio navegador.
 
-En GitHub: **Settings → Pages → Build and deployment → Deploy from a branch**, rama `main`, carpeta `/ (root)`. En uno o dos minutos estará en `https://jmlopezdona.github.io/human-vs-ai/`.
+La voz del narrador es sintética y no clona a ninguna persona. Se diseñó a
+partir de una descripción con Qwen3-TTS VoiceDesign, y cada frase la dice
+IndexTTS-2.5, con las piezas de la
+[mesa de doblaje](https://github.com/jmlopezdona/mesa-de-doblaje). Cómo se
+generan las locuciones está en [`narracion/`](narracion/README.md).
 
-Las etiquetas para compartir (`og:url`, `og:image` y `twitter:image` en `index.html`) apuntan a `https://jmlopezdona.github.io/human-vs-ai/`. Si publicas el repositorio con otro nombre o en otra cuenta, actualízalas.
+Si vas a modificar el proyecto, con o sin ayuda de una IA, empieza por
+[`AGENTS.md`](AGENTS.md).
 
 ## Rigor
 
-Las cifras son órdenes de magnitud aproximados. Consulta la sección de fuentes de la página y verifica cada dato antes de citarlo.
+Las cifras son órdenes de magnitud aproximados, no medidas exactas, y algunas
+comparaciones miden cosas parecidas pero no idénticas. La página dice de dónde
+sale cada una: compruébalas antes de citarlas.
 
 ## Licencia
 
 Hecho con cariño entre un humano y Claude (una IA).
 
-- **Contenido** (textos, gráficos e imágenes): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es). Ver [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md).
-- **Código** (HTML, CSS y JavaScript): [MIT](LICENSE).
-- **Locuciones** (`audio/`): generadas con IndexTTS-2.5, se rigen por la bilibili Model Use License Agreement, no por CC BY 4.0. Ver [`audio/NOTICE.md`](audio/NOTICE.md).
+- **Textos, gráficos e imágenes:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es). Ver [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md).
+- **Código:** [MIT](LICENSE).
+- **Locuciones** (`audio/`): generadas con IndexTTS-2.5, se rigen por la
+  bilibili Model Use License Agreement, no por CC BY 4.0. Ver
+  [`audio/NOTICE.md`](audio/NOTICE.md).

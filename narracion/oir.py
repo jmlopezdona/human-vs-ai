@@ -12,7 +12,7 @@ import whisper
 
 lengua, salida = sys.argv[1].split("-")[0], Path(sys.argv[2])
 # Una frase con aviso se oye con él delante
-guion = {clave: " ".join([*antes, texto]) for clave, texto, *antes in
+guion = {clave: " ".join([*antes, texto.replace(" | ", " ")]) for clave, texto, *antes in
          json.loads((Path(__file__).parent / "guion.json").read_text(encoding="utf-8"))[lengua]}
 norma = lambda t: re.sub(r"[^\w\s]", "", t.lower()).split()
 modelo = whisper.load_model("turbo", device="cuda")

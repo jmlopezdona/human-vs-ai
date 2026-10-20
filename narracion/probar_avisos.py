@@ -28,7 +28,7 @@ motor = s.Motor(variante, voz, salida)
 sueltos, en_frase = salida / "candidatos", salida / "candidatos-en-frase"
 sueltos.mkdir(parents=True, exist_ok=True)
 en_frase.mkdir(parents=True, exist_ok=True)
-clave, texto, aviso = next(f for f in motor.frases if len(f) == 3)
+clave, texto, aviso = next(f for f in motor.frases if len(f) == 3 and f[0].endswith("-warn"))
 try:
     m, hz, _, _ = motor.decir(texto, motor.receta)
     resto = s.recortar(m, hz)
