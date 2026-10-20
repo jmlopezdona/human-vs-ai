@@ -310,6 +310,52 @@ footer a{color:var(--tx-2)}
   .stage.is-fs .controls{gap:4px}
   .stage.is-fs .controls .btn{padding:9px 8px}
 }
+/* Modo vídeo en un móvil apaisado: poca altura, así que dos columnas.
+   A la izquierda el visual; a la derecha el título, el subtítulo y los botones. */
+@media (orientation:landscape) and (max-height:500px){
+  .stage.is-fs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto 1fr auto;grid-template-areas:"prog prog" "view head" "view cap" "view ctrl";column-gap:24px;align-content:center;padding:12px max(20px,env(safe-area-inset-right)) 12px max(20px,env(safe-area-inset-left));--box:min(calc(100vh - 60px),30vw)}
+  .stage.is-fs > *{max-width:none;margin:0}
+  .stage.is-fs .progress{grid-area:prog;margin-bottom:8px}
+  .stage.is-fs .step-head{grid-area:head;margin-bottom:0}
+  .stage.is-fs .step-title{font-size:22px}
+  .stage.is-fs #views{grid-area:view;align-self:center}
+  /* El subtítulo ocupa lo que dejan título y botones (la fila 1fr), sin la altura fija del más largo */
+  .stage.is-fs .caption{grid-area:cap;font-size:clamp(13px,3.6vh,15px);line-height:1.5;margin-top:6px;min-height:0!important}
+  .stage.is-fs .controls{grid-area:ctrl;align-self:end;gap:4px;margin-top:8px;flex-wrap:nowrap}
+  .stage.is-fs .controls .btn{padding:8px}
+  .stage.is-fs #play span,.stage.is-fs .next-label,.stage.is-fs .vol input[type=range]{display:none}
+  .stage.is-fs .legend{display:none}
+  /* Cara a cara: la ventaja encima y los paneles lado a lado, como en el móvil vertical */
+  .stage.is-fs .duel{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
+  .stage.is-fs .duel .vs{grid-row:1;grid-column:1/-1;flex-direction:row;min-width:0;margin-bottom:8px}
+  .stage.is-fs .duel .vs .badge{font-size:20px;padding:4px 10px}
+  .stage.is-fs .duel .vs small{max-width:none}
+  .stage.is-fs .duel .side.hu{grid-row:2/span 5;grid-column:1} .stage.is-fs .duel .side.ia{grid-row:2/span 5;grid-column:2}
+  .stage.is-fs .duel .side{display:grid;grid-template-rows:subgrid;row-gap:0;padding:10px 12px;height:auto}
+  .stage.is-fs .side .who{font-size:13px} .stage.is-fs .side .what{font-size:12px;line-height:1.3;min-height:0}
+  .stage.is-fs .side .zeros .n{font-size:32px}
+  .stage.is-fs .side .approx{font-size:11px;word-break:normal;overflow-wrap:anywhere;margin-bottom:6px}
+  /* Alejamiento: el lienzo tan alto como quepa y la cifra debajo, en una línea */
+  .stage.is-fs .zoom{grid-template-columns:minmax(0,1fr);gap:6px;justify-items:center}
+  .stage.is-fs .canvas-wrap{width:min(100%,calc(100vh - 110px));margin:0}
+  .stage.is-fs .zoom .zeros-n{font-size:30px;display:inline-block;margin:0 8px 0 0}
+  .stage.is-fs .zoom .zeros-u{display:inline-block;margin:0}
+  /* Primer paso: los nueve ceros en una fila y el número debajo, como en el móvil vertical */
+  .stage.is-fs .intro-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+  .stage.is-fs .dotbox{width:100%;aspect-ratio:auto;grid-template-columns:repeat(9,1fr);grid-template-rows:auto;min-height:52px;padding:6px}
+  .stage.is-fs .dotbox .hint{font-size:13px;line-height:1.35}
+  .stage.is-fs .big-number{font-size:34px}
+  .stage.is-fs .big-word{font-size:15px;margin:4px 0 6px}
+  .stage.is-fs input[type=range]{margin:6px 0 2px}
+  .stage.is-fs #intro-ex{margin-top:8px!important;min-height:0;padding:8px 12px;font-size:14px}
+  /* Final: las tres conclusiones en filas; el resumen para volver a un paso sobra en el vídeo */
+  .stage.is-fs .takeaways{grid-template-columns:minmax(0,1fr);gap:8px}
+  .stage.is-fs .take{padding:8px 12px}
+  .stage.is-fs .take i{font-size:18px} .stage.is-fs .take h3{font-size:14px}
+  .stage.is-fs .take p{font-size:12px;line-height:1.4;margin-top:2px}
+  .stage.is-fs .recap{display:none}
+  .stage.is-fs #v-outro:not([hidden]){min-height:0}
+}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
@@ -878,11 +924,13 @@ $('intro-range').addEventListener('input', renderIntro);
 // así las cajas y las bolas miden lo mismo en todos los pasos.
 const DUEL_MAX = Math.max(...STEPS.filter(st => st.type === 'duel').map(st => Math.max(st.hu, st.ia)));
 function duelLayout() { const cols = 5, rows = Math.ceil(DUEL_MAX / cols); return {cols, rows}; }
+// Móvil apaisado: a pantalla completa, el cara a cara va como en el móvil vertical.
+const LANDSCAPE_FS = '(orientation:landscape) and (max-height:500px)';
 // Las bolas ocupan el hueco que deja la cabecera del panel (de alto fijo en escritorio).
 function sizeDuelCanvas(cv, ratio) {
   const side = cv.parentElement;
   cv.style.width = '';
-  if (matchMedia('(max-width:760px)').matches) return;
+  if (matchMedia('(max-width:760px)').matches || $('stage').classList.contains('is-fs') && matchMedia(LANDSCAPE_FS).matches) return;
   const approx = side.querySelector('.approx');
   const avail = side.clientHeight - (approx.offsetTop + approx.offsetHeight + 10) - 16;
   cv.style.width = Math.max(60, Math.min(side.clientWidth - 32, avail / ratio)) + 'px';
@@ -1034,8 +1082,18 @@ function drawMagnifier(ctx, w, cell, n, colors) {
   ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
   ctx.beginPath(); ctx.arc(c, c, rad, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
   // Panel de la lupa
-  const S = Math.round(Math.min(w * 0.5, 260)), x0 = w - S - 10, y0 = w - S - 10, pad = 12, head = 22;
-  const gs = S - pad * 2 - head, gx = x0 + (S - gs) / 2, gy = y0 + pad + head, ci = gs / 9;
+  // Si el rótulo no cabe en una línea (lienzo pequeño, como en el móvil), va en dos
+  const S = Math.round(Math.min(w * 0.5, 260)), x0 = w - S - 10, y0 = w - S - 10, pad = 12, room = S - pad * 2;
+  const fitFont = txt => { ctx.font = '600 12px Inter, system-ui, sans-serif'; return Math.max(9, Math.min(12, 12 * room / ctx.measureText(txt).width)); };
+  const lineSet = ci => { const title = t.inset(fmt(ci / cell)), one = fitFont(title);
+    if (one >= 10.5) return [[title, one]];
+    const i = title.indexOf(': ') + 1, parts = i ? [title.slice(0, i), title.slice(i + 1)] : [title];
+    const f = Math.min(...parts.map(fitFont)); return parts.map(x => [x, f]); };
+  // El aumento depende del tamaño de la rejilla, que depende del alto del rótulo
+  const gridOf = n => S - pad * 2 - (n > 1 ? 36 : 22);
+  let lines = lineSet(gridOf(1) / 9);
+  if (lines.length > 1) lines = lineSet(gridOf(2) / 9);
+  const gs = gridOf(lines.length), gx = x0 + (S - gs) / 2, gy = y0 + pad + S - pad * 2 - gs, ci = gs / 9;
   // Línea que une círculo y lupa
   const a = Math.atan2(y0 - c, x0 - c);
   ctx.strokeStyle = tx; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
@@ -1047,11 +1105,8 @@ function drawMagnifier(ctx, w, cell, n, colors) {
   if (ctx.roundRect) ctx.roundRect(x0, y0, S, S, 14); else ctx.rect(x0, y0, S, S);
   ctx.fill(); ctx.restore();
   ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.stroke();
-  const title = t.inset(fmt(ci / cell));
-  ctx.font = '600 12px Inter, system-ui, sans-serif';
-  const fs = Math.max(9, Math.min(12, 12 * (S - pad * 2) / ctx.measureText(title).width));
-  ctx.font = `600 ${fs.toFixed(1)}px Inter, system-ui, sans-serif`; ctx.fillStyle = tx;
-  ctx.fillText(title, x0 + pad, y0 + pad + 10);
+  ctx.fillStyle = tx;
+  lines.forEach(([txt, f], i) => { ctx.font = `600 ${f.toFixed(1)}px Inter, system-ui, sans-serif`; ctx.fillText(txt, x0 + pad, y0 + pad + 10 + i * 14); });
   const groups = new Map(), r = ci * 0.38;
   if (sel >= 0) drawRegion(ctx, Math.min(BANDS[sel].to, 80), gx, gy, ci, colors[sel]);
   for (let k = 0; k < 80; k++) {
@@ -1059,13 +1114,18 @@ function drawMagnifier(ctx, w, cell, n, colors) {
     addDot(groups, k, gx + x * ci + ci / 2, gy + y * ci + ci / 2, r, 4);
   }
   fillGroups(ctx, colors, groups);
-  if (vs) pill(ctx, t.vecLabel, 6, vs + 18, tx);
+  if (vs) pill(ctx, t.vecLabel, 6, vs + 18, tx, w - 14);
 }
-function pill(ctx, text, x, y, color) {
+// Si no cabe en maxW, el paréntesis pasa a una segunda línea
+function pill(ctx, text, x, y, color, maxW = Infinity) {
   ctx.font = '600 12px Inter, system-ui, sans-serif';
-  const tw = ctx.measureText(text).width;
-  ctx.fillStyle = cssVar('--bg'); ctx.globalAlpha = .88; ctx.fillRect(x - 4, y - 13, tw + 8, 18); ctx.globalAlpha = 1;
-  ctx.fillStyle = color; ctx.fillText(text, x, y);
+  const i = text.indexOf(' (');
+  const lines = ctx.measureText(text).width > maxW && i > 0 ? [text.slice(0, i), text.slice(i + 1)] : [text];
+  lines.forEach((txt, k) => {
+    const tw = ctx.measureText(txt).width, ly = y + k * 18;
+    ctx.fillStyle = cssVar('--bg'); ctx.globalAlpha = .88; ctx.fillRect(x - 4, ly - 13, tw + 8, 18); ctx.globalAlpha = 1;
+    ctx.fillStyle = color; ctx.fillText(txt, x, ly);
+  });
 }
 function renderZoom(st, tx) {
   const t = L(), n = st.n, colors = BANDS.map(b => cssVar(b.v));
