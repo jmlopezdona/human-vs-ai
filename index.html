@@ -886,7 +886,7 @@ const progress = $('progress');
 STEPS.forEach((s, k) => {
   const b = document.createElement('button');
   b.setAttribute('role', 'tab');
-  b.onclick = () => { stopAuto(); go(k); };
+  b.onclick = () => jump(k);
   progress.appendChild(b);
 });
 
@@ -1354,6 +1354,14 @@ function stopAuto() {
   playing = false; beatToken++; beat = null; clearTimeout(autoTimer); clearTiming(); renderPlay();
   voice.stop(); music.stop();
 }
+// Ir a otro paso con los botones, la barra, las flechas o el resumen. Si el
+// vídeo va en marcha, sigue desde ese paso (la música no se corta); si no, para.
+function jump(k) {
+  if (!playing) { stopAuto(); go(k); return; }
+  beatToken++; beat = null; clearTimeout(autoTimer); clearTiming();
+  voice.stop();
+  go(k);
+}
 
 /* ---------- Sonido del modo vídeo ---------- */
 // La voz y la música se pueden quitar por separado, y el volumen y el
@@ -1396,10 +1404,13 @@ const voice = (() => {
       if (p && p.then) p.then(() => { el.pause(); el.muted = false; }, () => { el.muted = false; });
       else el.muted = false;
     },
-    // Calienta la caché del navegador con la siguiente locución
+    // Calienta la caché del navegador con la siguiente locución. Con fetch y no
+    // con un elemento de audio: cada elemento es un reproductor que no se
+    // libera, y Chrome y Edge en Android cortan el audio si hay demasiados.
     preload(key) {
       if (!sound.voice || !VOICE_S[voiceDir()][key] || warm[src(key)]) return;
-      const a = new Audio(); a.preload = 'auto'; a.src = src(key); warm[src(key)] = a;
+      warm[src(key)] = true;
+      if (window.fetch) fetch(src(key)).catch(() => { warm[src(key)] = false; });
     },
     say(key) {
       stop();
@@ -1418,41 +1429,34 @@ const voice = (() => {
 
 /* Música de fondo, generada en el navegador con Web Audio: un colchón de
    acordes lentos, un bajo suave y notas sueltas, como puntos que aparecen.
-   Baja de volumen mientras habla el narrador. */
+   Se genera una vez, sin sonar (OfflineAudioContext), y luego se repite en
+   bucle desde un búfer: generarla en directo (decenas de osciladores, la
+   reverberación y el compresor) era demasiado para algunos móviles Android y
+   el audio petardeaba y se cortaba. Baja de volumen mientras habla el narrador. */
 const music = (() => {
   const AC = window.AudioContext || window.webkitAudioContext;
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
   const LEVEL = 0.35, DUCKED = 0.16, CHORD_S = 8;
   // La menor: Am9 · Fmaj7 · Cmaj7 · G6, en semitonos sobre La 2 (110 Hz)
   const CHORDS = [[0, 7, 14, 15, 19], [-4, 3, 12, 15, 19], [3, 10, 14, 19, 22], [-2, 5, 14, 17, 21]];
   const SPARK = [24, 27, 29, 31, 34, 36, 39]; // pentatónica de La menor, dos octavas arriba
+  // El bucle son dos vueltas de acordes (64 s). TAIL: lo que suena tras el
+  // final (notas que se apagan y reverberación), que se suma al principio para
+  // que el bucle no tenga costura. 32 kHz basta para esta música y ocupa menos.
+  const LOOP = 2 * CHORDS.length * CHORD_S, TAIL = 7, RATE = 32000;
   const hz = st => 110 * Math.pow(2, st / 12);
-  let ctx = null, out, duckGain, volGain, wet, dry, sends = {}, next = 0, chord = 0, sparkAt = 0, timer = 0, on = false, ducked = false;
+  let ctx = null, out, volGain, src = null, on = false, ducked = false;
+  let ac, wet, dry, sends; // contexto en el que se está generando la música
 
-  function setup() {
-    // «playback»: búferes más grandes; a la música no le importa la latencia y
-    // así el hilo de audio no se queda corto (los cortos suenan a chasquidos)
-    try { ctx = new AC({latencyHint: 'playback'}); } catch (e) { ctx = new AC(); }
-    out = ctx.createGain(); out.gain.value = 0;
-    duckGain = ctx.createGain(); duckGain.gain.value = 1;
-    const comp = ctx.createDynamicsCompressor();
-    volGain = ctx.createGain(); volGain.gain.value = gain();
-    out.connect(duckGain).connect(comp).connect(volGain).connect(ctx.destination);
-    // Reverberación con una respuesta de ruido que decae
-    const len = ctx.sampleRate * 3.5, ir = ctx.createBuffer(2, len, ctx.sampleRate);
-    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5); }
-    const rev = ctx.createConvolver(); rev.buffer = ir;
-    wet = ctx.createGain(); wet.gain.value = 0.55; wet.connect(rev).connect(out);
-    dry = ctx.createGain(); dry.gain.value = 0.45; dry.connect(out);
-  }
   // Ganancia del paso bajo de Web Audio (Q 0,3 dB) a una frecuencia, con la
   // fórmula de la especificación: lo que el filtro le haría a un seno
   const lp = {};
   function lowpassAt(freq, cutoff) {
     const key = freq.toFixed(2) + '|' + cutoff;
     if (!(key in lp)) {
-      const w0 = 2 * Math.PI * cutoff / ctx.sampleRate, al = Math.sin(w0) / (2 * Math.pow(10, 0.3 / 20)), c = Math.cos(w0);
+      const w0 = 2 * Math.PI * cutoff / RATE, al = Math.sin(w0) / (2 * Math.pow(10, 0.3 / 20)), c = Math.cos(w0);
       const b0 = (1 - c) / 2, b1 = 1 - c, a0 = 1 + al, a1 = -2 * c, a2 = 1 - al;
-      const w = 2 * Math.PI * freq / ctx.sampleRate, z1 = [Math.cos(w), -Math.sin(w)], z2 = [Math.cos(2 * w), -Math.sin(2 * w)];
+      const w = 2 * Math.PI * freq / RATE, z1 = [Math.cos(w), -Math.sin(w)], z2 = [Math.cos(2 * w), -Math.sin(2 * w)];
       const num = [b0 + b1 * z1[0] + b0 * z2[0], b1 * z1[1] + b0 * z2[1]], den = [a0 + a1 * z1[0] + a2 * z2[0], a1 * z1[1] + a2 * z2[1]];
       lp[key] = Math.hypot(...num) / Math.hypot(...den);
     }
@@ -1461,9 +1465,9 @@ const music = (() => {
   // Un par de envíos (reverberación y directo) por cada nivel, compartido por todas las notas
   function sendFor(send) {
     if (!sends[send]) {
-      const sw = ctx.createGain(); sw.gain.value = send; sw.connect(wet);
-      const sd = ctx.createGain(); sd.gain.value = 1 - send; sd.connect(dry);
-      const bus = ctx.createGain(); bus.connect(sw); bus.connect(sd);
+      const sw = ac.createGain(); sw.gain.value = send; sw.connect(wet);
+      const sd = ac.createGain(); sd.gain.value = 1 - send; sd.connect(dry);
+      const bus = ac.createGain(); bus.connect(sw); bus.connect(sd);
       sends[send] = bus;
     }
     return sends[send];
@@ -1471,35 +1475,69 @@ const music = (() => {
   function tone(freq, t, dur, {type = 'sine', peak = 0.05, attack = 2.5, release = 3, cutoff = 1400, send = 0.6, detune = 0} = {}) {
     // Un seno no tiene armónicos que filtrar: en vez del filtro, su ganancia a esa frecuencia
     if (type === 'sine') peak *= lowpassAt(freq * Math.pow(2, detune / 1200), cutoff);
-    const o = ctx.createOscillator(), g = ctx.createGain();
+    const o = ac.createOscillator(), g = ac.createGain();
     o.type = type; o.frequency.value = freq; o.detune.value = detune;
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(peak, t + attack);
     g.gain.setValueAtTime(peak, t + dur);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur + release);
     if (type === 'sine') o.connect(g);
-    else { const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = cutoff; f.Q.value = 0.3; o.connect(f).connect(g); }
+    else { const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = cutoff; f.Q.value = 0.3; o.connect(f).connect(g); }
     g.connect(sendFor(send));
     o.start(t); o.stop(t + dur + release + 0.1);
   }
-  function schedule() {
-    const ahead = ctx.currentTime + 1.5;
-    while (next < ahead) {
-      const notes = CHORDS[chord++ % CHORDS.length];
-      tone(hz(notes[0] - 12), next, CHORD_S - 1, {peak: 0.28, attack: 3, cutoff: 400, send: 0.3});
+  // Genera el bucle sin sonar y lo devuelve como búfer
+  function render() {
+    ac = new OAC(2, Math.ceil((LOOP + TAIL) * RATE), RATE); sends = {};
+    // El compresor recibe la música al volumen normal, como cuando se generaba en directo
+    const comp = ac.createDynamicsCompressor(), mix = ac.createGain(); mix.gain.value = LEVEL;
+    mix.connect(comp).connect(ac.destination);
+    // Reverberación con una respuesta de ruido que decae
+    const len = RATE * 3.5, ir = ac.createBuffer(2, len, RATE);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5); }
+    const rev = ac.createConvolver(); rev.buffer = ir;
+    wet = ac.createGain(); wet.gain.value = 0.55; wet.connect(rev).connect(mix);
+    dry = ac.createGain(); dry.gain.value = 0.45; dry.connect(mix);
+    for (let k = 0, t = 0; t < LOOP; k++, t += CHORD_S) {
+      const notes = CHORDS[k % CHORDS.length];
+      tone(hz(notes[0] - 12), t, CHORD_S - 1, {peak: 0.28, attack: 3, cutoff: 400, send: 0.3});
       notes.forEach(st => {
-        tone(hz(st), next, CHORD_S - 1.5, {type: 'triangle', peak: 0.07, detune: -6});
-        tone(hz(st), next, CHORD_S - 1.5, {peak: 0.09, detune: 6});
+        tone(hz(st), t, CHORD_S - 1.5, {type: 'triangle', peak: 0.07, detune: -6});
+        tone(hz(st), t, CHORD_S - 1.5, {peak: 0.09, detune: 6});
       });
-      next += CHORD_S;
     }
-    while (sparkAt < ahead) {
+    for (let t = 2; t < LOOP - 0.5; t += 1.6 + Math.random() * 3.2) {
       const st = SPARK[Math.floor(Math.random() * SPARK.length)];
-      tone(hz(st), sparkAt, 0.05, {peak: 0.12, attack: 0.025, release: 2.2, cutoff: 5000, send: 0.8});
-      sparkAt += 1.6 + Math.random() * 3.2;
+      tone(hz(st), t, 0.05, {peak: 0.12, attack: 0.025, release: 2.2, cutoff: 5000, send: 0.8});
     }
+    const done = new Promise(res => { ac.oncomplete = e => res(e.renderedBuffer); });
+    const p = ac.startRendering();
+    return (p && p.then ? p : done).then(full => {
+      // Lo que suena tras el final del bucle se suma a su principio
+      const n = LOOP * RATE, buf = ctx.createBuffer(2, n, RATE);
+      for (let c = 0; c < 2; c++) {
+        const d = full.getChannelData(c), o = buf.getChannelData(c);
+        o.set(d.subarray(0, n));
+        for (let i = 0, m = d.length - n; i < m; i++) o[i] += d[n + i];
+      }
+      ac = wet = dry = sends = null;
+      return buf;
+    });
   }
-  const level = () => (ducked ? DUCKED : LEVEL);
+  function setup() {
+    // «playback»: búferes más grandes; a la música no le importa la latencia
+    try { ctx = new AC({latencyHint: 'playback'}); } catch (e) { ctx = new AC(); }
+    out = ctx.createGain(); out.gain.value = 0;
+    volGain = ctx.createGain(); volGain.gain.value = gain();
+    out.connect(volGain).connect(ctx.destination);
+    render().then(buf => {
+      src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+      src.connect(out); src.start();
+      if (on) rampOut(level(), 3);
+    }, () => {});
+  }
+  // El bucle ya lleva el volumen normal: aquí solo se baja cuando habla el narrador
+  const level = () => (ducked ? DUCKED / LEVEL : 1);
   // Lleva el volumen hacia «to» en unos «secs» segundos. setTargetAtTime parte
   // siempre del valor real y no corta nada en curso: cancelar una rampa a
   // medias, o leer gain.value en ella, hacía saltar el volumen (un chasquido).
@@ -1510,26 +1548,23 @@ const music = (() => {
   }
   return {
     start() {
-      if (!sound.music || !AC) return;
+      if (!sound.music || !AC || !OAC) return;
       if (!ctx) setup();
       ctx.resume();
-      const t = ctx.currentTime;
-      if (!on) { on = true; next = Math.max(next, t + 0.1); sparkAt = Math.max(sparkAt, t + 2); }
-      rampOut(level(), 3);
-      clearInterval(timer); schedule(); timer = setInterval(schedule, 500);
+      on = true;
+      if (src) rampOut(level(), 3); // si aún se está generando, sube al terminar
     },
     stop() {
       if (!ctx || !on) return;
       on = false;
       rampOut(0, 1.5);
-      clearInterval(timer);
-      // Las notas ya programadas se dejan sonar bajo el fundido; luego se suspende
+      // Tras el fundido se suspende: el bucle se queda donde iba
       setTimeout(() => { if (!on) ctx.suspend(); }, 2500);
     },
     setVolume() { if (ctx) volGain.gain.setTargetAtTime(gain(), ctx.currentTime, 0.05); },
     duck(v) {
       ducked = v;
-      if (!ctx || !on) return;
+      if (!ctx || !on || !src) return;
       rampOut(level(), v ? 0.4 : 1.2);
     }
   };
@@ -1611,13 +1646,13 @@ $('more-btn').onclick = () => {
   $('more-btn').setAttribute('aria-expanded', open);
 };
 
-$('next').onclick = () => { stopAuto(); go(cur + 1); };
-$('prev').onclick = () => { stopAuto(); go(cur - 1); };
+$('next').onclick = () => jump(cur + 1);
+$('prev').onclick = () => jump(cur - 1);
 $('play').onclick = () => playing ? pauseAuto() : startAuto();
 document.addEventListener('keydown', e => {
   if (e.target.matches('input, textarea')) return;
-  if (e.key === 'ArrowRight') { stopAuto(); go(cur + 1); }
-  else if (e.key === 'ArrowLeft') { stopAuto(); go(cur - 1); }
+  if (e.key === 'ArrowRight') jump(cur + 1);
+  else if (e.key === 'ArrowLeft') jump(cur - 1);
   else if (e.key === 'Escape' && stage.classList.contains('fs')) exitFs();
   else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); playing ? pauseAuto() : startAuto(); }
 });
@@ -1657,7 +1692,7 @@ function renderRecap() {
     return null;
   }).filter(Boolean).map(([k, z, label]) =>
     `<button type="button" class="recap-item" data-k="${k}"><span class="rz">${z}</span><span class="rl">${label}</span></button>`).join('');
-  $('recap').querySelectorAll('button').forEach(b => b.onclick = () => { stopAuto(); go(+b.dataset.k); });
+  $('recap').querySelectorAll('button').forEach(b => b.onclick = () => jump(+b.dataset.k));
 }
 
 /* ---------- Tabla ---------- */

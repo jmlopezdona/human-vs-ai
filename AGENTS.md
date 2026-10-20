@@ -56,7 +56,9 @@ Invariantes que no se ven a simple vista:
 - **Pausar no es parar.** `pauseAuto` guarda en `beat` el subtítulo en curso,
   el tiempo que le queda y la locución a medias, y `resumeAuto` sigue desde
   ahí. Salir de pantalla completa también pausa. Parar del todo (`stopAuto`)
-  es para lo que cambia de paso, de idioma o de tema. Mientras haya un `beat`
+  es para lo que cambia de idioma o de tema. Cambiar de paso (botones, barra,
+  flechas, resumen) pasa por `jump`: con el vídeo en marcha, sigue desde el
+  paso nuevo; si no, para. Mientras haya un `beat`
   del paso, un redibujado (`lockHeights` → `backTo`) lo conserva y `stepDone`
   no empieza el paso de nuevo.
 - **Idioma y voz son dos cosas.** `lang` (`es` o `en`) elige el texto;
@@ -70,6 +72,13 @@ Invariantes que no se ven a simple vista:
 - **El audio arranca dentro de un gesto.** `startAuto` llama a `music.start()`
   y `voice.unlock()` dentro del clic o la tecla; todas las locuciones salen del
   mismo elemento de audio para que iPhone las deje sonar.
+- **El audio tiene que aguantar un Android modesto.** La música se genera una
+  vez sin sonar (`OfflineAudioContext`) y se repite en bucle desde un búfer:
+  generarla en directo hacía petardear el audio y cortaba las voces. La
+  siguiente locución se precarga con `fetch`, no con otro `Audio()`: Chrome y
+  Edge en Android cortan el sonido si hay demasiados reproductores. Las subidas
+  y bajadas de volumen van con `setTargetAtTime`; cancelar una rampa a medias
+  hace saltar el volumen (un chasquido).
 
 ## Cambiar una cifra
 
