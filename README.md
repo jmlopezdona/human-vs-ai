@@ -9,6 +9,8 @@ Sitio 100 % estático (HTML, CSS y JavaScript), sin paso de compilación.
 ```
 .
 ├── index.html      La visualización completa (HTML, CSS y JS en un solo archivo)
+├── LICENSE         Licencia MIT del código
+├── LICENSE-CONTENT.md  Licencia CC BY 4.0 de textos e imágenes
 ├── og-image.png    Imagen para compartir en redes (1200×630)
 ├── README.md
 └── .nojekyll       Evita que GitHub Pages procese el sitio con Jekyll
@@ -51,3 +53,10 @@ Las etiquetas para compartir (`og:url`, `og:image` y `twitter:image` en `index.h
 ## Rigor
 
 Las cifras son órdenes de magnitud aproximados. Consulta la sección de fuentes de la página y verifica cada dato antes de citarlo.
+
+## Licencia
+
+Hecho con cariño entre un humano y Claude (una IA).
+
+- **Contenido** (textos, gráficos e imágenes): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es). Ver [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md).
+- **Código** (HTML, CSS y JavaScript): [MIT](LICENSE).

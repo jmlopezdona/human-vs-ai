@@ -228,7 +228,9 @@ td.mag{font-family:var(--mono);font-size:13px;white-space:nowrap}
 .warn-list li i{font-size:20px;color:var(--bb);flex:none;margin-top:1px}
 .sources{columns:2 320px;column-gap:28px;padding-left:18px;margin:0;font-size:14px;color:var(--tx-2)}
 .sources li{margin-bottom:8px;break-inside:avoid}
-footer{padding:28px 0 48px;color:var(--tx-3);font-size:13px;border-top:1px solid var(--line)}
+footer{padding:28px 0 48px;color:var(--tx-3);font-size:13px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:center;text-align:center;gap:6px 0}
+footer > span:not(:last-child)::after{content:"·";margin:0 10px;color:var(--line-strong)}
+footer .ti-heart{color:var(--uni)}
 footer a{color:var(--tx-2)}
 
 @keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
@@ -435,9 +437,7 @@ footer a{color:var(--tx-2)}
     </ol>
   </section>
 
-  <footer data-i18n="footer">
-    Hecho con HTML, CSS y JavaScript, sin dependencias de compilación.
-  </footer>
+  <footer data-i18n="footer"><span><i class="ti ti-heart" aria-hidden="true"></i> Hecho con cariño entre un humano y Claude (una IA)</span><span><a href="https://github.com/jmlopezdona/human-vs-ai">Ver en GitHub</a></span></footer>
 </div>
 
 <script>
@@ -711,7 +711,7 @@ const T = {
       s11: 'Age of the universe (13.8 billion years): <a href="https://en.wikipedia.org/wiki/Age_of_the_universe">Age of the universe</a>, Wikipedia.',
       s12: 'Atoms in the observable universe (~10⁸⁰): <a href="https://en.wikipedia.org/wiki/Observable_universe">Observable universe</a>, Wikipedia.',
       s13: 'Ways to store a word and possible texts: our own calculation (2<sup>16 × 12,288</sup> and 100,000<sup>200,000</sup>).',
-      footer: 'Built with HTML, CSS and JavaScript, no build step required.'
+      footer: '<span><i class="ti ti-heart" aria-hidden="true"></i> Made with love by a human and Claude (an AI)</span><span><a href="https://github.com/jmlopezdona/human-vs-ai">View on GitHub</a></span>'
     }
   }
 };
@@ -1157,7 +1157,7 @@ function onFsChange() {
   wasFs = on;
   stage.classList.toggle('is-fs', on);
   if (!on && playing) stopAuto();
-  lastW = innerWidth;
+  lastW = innerWidth; lastH = innerHeight;
   lockHeights(); // vuelve a medir y dibujar con el nuevo tamaño
 }
 document.addEventListener('fullscreenchange', onFsChange);
@@ -1182,7 +1182,17 @@ document.addEventListener('keydown', e => {
 });
 const fromHash = () => { const m = location.hash.match(/^#(?:paso|step)-(\d+)$/); return m ? Math.min(STEPS.length, Math.max(1, +m[1])) - 1 : null; };
 window.addEventListener('hashchange', () => { const k = fromHash(); if (k !== null && k !== cur) go(k, true); });
-let rt, lastW = innerWidth; window.addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(lockHeights, 150); });
+// Los tamaños dependen del ancho y del alto de la ventana (vh): hay que volver a
+// medir si cambia cualquiera de los dos, p. ej. al salir de pantalla completa.
+// En móvil se ignoran los cambios de alto (la barra del navegador aparece y
+// desaparece al desplazarse) y allí no hay altura fija.
+let rt, lastW = innerWidth, lastH = innerHeight;
+window.addEventListener('resize', () => {
+  const wChanged = innerWidth !== lastW, hChanged = innerHeight !== lastH;
+  lastW = innerWidth; lastH = innerHeight;
+  if (!wChanged && (!hChanged || matchMedia('(max-width:760px)').matches)) return;
+  clearTimeout(rt); rt = setTimeout(lockHeights, 150);
+});
 
 /* ---------- Tema ---------- */
 const root = document.documentElement;
