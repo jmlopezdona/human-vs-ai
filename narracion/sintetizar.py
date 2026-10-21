@@ -54,9 +54,8 @@ POR_VOZ = {
     "es-ES": {"guion": "es", "idioma": "es-ES", "modelo": MODELO_AJUSTADO, "duration_factor": 1.0,
               "aviso": {"vector": {}, "semilla": 0},
               # 3-cap: un «el» suelto antes de «Aquí»; 3-idea: «dos mil veinticinco»; 5-idea: «GP. T3» y «pesos de
-              # tensión»; 9-idea: «reconoció» y «honda»; 11-cap: partía el título en dos
-              # preguntas; 11-idea: «unos» sonaba a «uno»; 12-cap: se comía el «Qué»
-              "semillas": {"3-cap": 10, "3-idea": 40, "5-idea": 10, "9-idea": 20, "11-cap": 70, "11-idea": 10, "12-cap": 20}},
+              # tensión»; 9-idea: «reconoció» y «honda»; 12-cap: se comía el «Qué»; 12-idea: «no todos son»
+              "semillas": {"3-cap": 10, "3-idea": 40, "5-idea": 10, "9-idea": 20, "12-cap": 20, "12-idea": 10}},
     "es-419": {"guion": "es", "idioma": "es-419", "modelo": MODELO_BASE, "duration_factor": 1.0,
                "aviso": {"vector": {}, "semilla": 0},
                # 3-idea: «dos mil veinticinco»; 4-cap: «lee» sonaba a «li»; 5-idea: decía «Su cerebro»; 9-idea: «más

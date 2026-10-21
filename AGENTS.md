@@ -93,7 +93,7 @@ idiomas:
    la citan.
 3. La fila de la tabla (`T.*.rows`) y las conclusiones del final (`take*` en el
    HTML y en `T.en.ui`).
-4. Las fuentes (`s1`…`s21` en el HTML y en `T.en.ui`) y las advertencias (`w*`).
+4. Las fuentes (`s1`…`s22` en el HTML y en `T.en.ui`) y las advertencias (`w*`).
 5. La frase hablada en `narracion/guion.json`, y su audio regenerado.
 
 Busca el valor antiguo con `grep` para no dejarte ninguno.
